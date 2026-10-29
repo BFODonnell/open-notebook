@@ -1,0 +1,8 @@
+DEFINE TABLE db_research_turn SCHEMAFULL;
+DEFINE FIELD payload ON db_research_turn FLEXIBLE TYPE object;
+DEFINE FIELD state ON db_research_turn TYPE string;
+DEFINE FIELD session_id ON db_research_turn TYPE string;
+DEFINE FIELD notebook_id ON db_research_turn TYPE string;
+DEFINE FIELD created ON db_research_turn TYPE option<datetime>;
+DEFINE FIELD updated ON db_research_turn TYPE option<datetime>;
+DEFINE INDEX research_session ON db_research_turn FIELDS session_id;

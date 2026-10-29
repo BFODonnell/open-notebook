@@ -154,6 +154,7 @@ export interface SourceChatSession extends BaseChatSession {
 }
 
 export interface SourceChatMessage {
+  database_turn_id?: string | null
   id: string
   type: 'human' | 'ai'
   content: string
@@ -201,6 +202,7 @@ export interface NotebookChatSession extends BaseChatSession {
 }
 
 export interface NotebookChatMessage {
+  database_turn_id?: string | null
   id: string
   type: 'human' | 'ai'
   content: string

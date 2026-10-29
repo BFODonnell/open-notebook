@@ -31,6 +31,7 @@ from api.routers import (
     databridge,
     databridge_catalog,
     databridge_mcp,
+    databridge_research,
     embedding,
     embedding_rebuild,
     episode_profiles,
@@ -389,6 +390,9 @@ async def open_notebook_error_handler(request: Request, exc: OpenNotebookError):
 app.include_router(auth.router, prefix="/api", tags=["auth"])
 app.include_router(databridge.router, prefix="/api", tags=["databridge"])
 app.include_router(databridge_mcp.router, prefix="/api", tags=["databridge-mcp"])
+app.include_router(
+    databridge_research.router, prefix="/api", tags=["databridge-research"]
+)
 app.include_router(
     databridge_catalog.router, prefix="/api", tags=["databridge-catalog"]
 )

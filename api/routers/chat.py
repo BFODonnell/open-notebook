@@ -341,6 +341,28 @@ async def execute_chat(request: ExecuteChatRequest):
         state_values["context"] = request.context
         state_values["notebook"] = notebook
         state_values["model_override"] = model_override
+        state_values["database_reply"] = None
+
+        # Discover freshly imported datasets on every turn in the current session.
+        # Client context never supplies SQL authority, versions or credentials.
+        from open_notebook.databridge import research
+
+        if notebook is not None and research.enabled():
+            turn = await research.prepare(
+                full_session_id,
+                str(notebook.id),
+                request.message,
+                request.context,
+                model_override,
+                state_values["messages"],
+            )
+            if turn:
+                reply = research.message(turn)
+                state_values["database_reply"] = {
+                    "content": reply.content,
+                    "id": reply.id,
+                    "additional_kwargs": reply.additional_kwargs,
+                }
 
         # Add user message to state
         from langchain_core.messages import HumanMessage

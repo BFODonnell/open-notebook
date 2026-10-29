@@ -1,0 +1,5 @@
+# Adds conversational planning; does not weaken Phase 2 SQL authorization.
+services:
+  open-notebook:
+    environment:
+      DATABRIDGE_RESEARCH_ENABLED: 'true'

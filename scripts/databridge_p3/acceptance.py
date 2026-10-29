@@ -93,7 +93,10 @@ async def main(mode):
             check(
                 {j["version_id"] for j in state["jobs"]}
                 <= {d["version_id"] for d in context["datasets"]}
-                and context["conversational_analysis"] is False,
+                and context["conversational_analysis"]
+                == (
+                    os.getenv("DATABRIDGE_RESEARCH_ENABLED", "false").lower() == "true"
+                ),
                 "Notebook dataset discovery persists without claiming conversational analysis",
             )
         else:
@@ -268,7 +271,10 @@ async def main(mode):
             )
             check(
                 len(context["datasets"]) == 4
-                and context["conversational_analysis"] is False,
+                and context["conversational_analysis"]
+                == (
+                    os.getenv("DATABRIDGE_RESEARCH_ENABLED", "false").lower() == "true"
+                ),
                 "Research-agent interface exposes active notebook versions and the DB-DATA-02 boundary",
             )
             check(

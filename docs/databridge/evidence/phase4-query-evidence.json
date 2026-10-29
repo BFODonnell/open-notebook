@@ -1,0 +1,199 @@
+{
+  "total": {
+    "id": "db_research_turn:39e5a21bfc1d40a2aa1d9aa6b25b79bb",
+    "question": "What is the total unlinked passenger trips?",
+    "state": "completed",
+    "dataset": {
+      "columns": [
+        {
+          "column": "c_1_report_year",
+          "original": "Report Year",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_2_ntd_id",
+          "original": "NTD ID",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_3_county_fips",
+          "original": "County FIPS",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_4_unlinked_passenger_trips",
+          "original": "Unlinked Passenger Trips",
+          "type": "BIGINT"
+        }
+      ],
+      "connection_id": "db_connection:7ce170ae60544d1dbfdcf060c084d321",
+      "connection_revision": "2fc55b55-9d61-4574-83d2-8f297002e657",
+      "database_sha256": "3d9f3833b821c37e408d20f293e833b0c6682b36f8891a4269b35bc52ff4aa6c",
+      "dataset_id": "1b7e127b-bf69-5866-9a0d-1e2c80359bbb",
+      "description": "Synthetic values only. Not official NTD statistics. <script>alert('untrusted metadata')</script>",
+      "download_url": "https://data.transportation.gov/files/sample.csv",
+      "import_id": "db_import:f1680a32e94817d172fb16cf6d7773fe6257af4c",
+      "license": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "publisher": {
+        "name": "DataBridge synthetic fixture"
+      },
+      "raw_sha256": "ecf43192f09953390bdefa4426026f62c796db7c76d5e4369516e2412bda6456",
+      "retrieved_at": "2026-10-29T22:47:08.935096+00:00",
+      "rows": 4,
+      "schema_sha256": "97da293fbdab33951f6c36c343089a6c112ddcd46ecc9838faca39d9b0d8fa56",
+      "semantic_status": "publisher metadata only; cross-source geography/time/units not certified",
+      "source_id": "source:7ce170ae60544d1dbfdcf060c084d321",
+      "spatial": "Synthetic county 01001; not an agency service-area crosswalk",
+      "table": "data",
+      "temporal": "2022/2025",
+      "title": "Synthetic NTD 2022\u20132025 service fixture",
+      "version_id": "7ce170ae-6054-4d1d-bfdc-f060c084d321"
+    },
+    "evidence": {
+      "bytes": 15,
+      "completed_at": "2026-10-29T22:47:15.503573+00:00",
+      "connection_id": "db_connection:7ce170ae60544d1dbfdcf060c084d321",
+      "dataset_sha256": "3d9f3833b821c37e408d20f293e833b0c6682b36f8891a4269b35bc52ff4aa6c",
+      "fingerprint": "70f188bb6eed37fdfac4e2e1d26786dacfa5c0d02dc54ffe6086ad8ae24e1633",
+      "id": "db_query_run:bhwhep9e5n3947ckz1ly",
+      "notebook_id": "notebook:9lybm29w0z4tc7cxhumy",
+      "parameters": {},
+      "plan_id": "db_query_plan:i0hf9stp758d3nbvoug9",
+      "policy": "databridge-select-v1",
+      "result_sha256": "d07e151e7059f5e1aa2b86e845f76ec5d0bf44985395aed1ad87dfa18fd70b6a",
+      "revision": "2fc55b55-9d61-4574-83d2-8f297002e657",
+      "row_count": 1,
+      "rows": [
+        {
+          "trips": 700
+        }
+      ],
+      "sql": "SELECT SUM(\"c_4_unlinked_passenger_trips\") AS \"trips\" FROM \"data\" LIMIT 100",
+      "status": "success",
+      "timestamp": "2026-10-29T22:47:13.455617+00:00",
+      "version_id": "7ce170ae-6054-4d1d-bfdc-f060c084d321"
+    },
+    "verification": {
+      "method": "exact-result-cell-and-document-excerpt",
+      "result_sha256": "d07e151e7059f5e1aa2b86e845f76ec5d0bf44985395aed1ad87dfa18fd70b6a"
+    },
+    "chart": null,
+    "answer": "Database evidence for Synthetic NTD 2022\u20132025 service fixture.\n\nThe executed query returned these verified values:\n\n- Result row 1, trips: 700.\n\nAttribution: dataset 1b7e127b-bf69-5866-9a0d-1e2c80359bbb; immutable version 7ce170ae-6054-4d1d-bfdc-f060c084d321; evidence db_query_run:bhwhep9e5n3947ckz1ly; query plan db_query_plan:i0hf9stp758d3nbvoug9.\n\nExecuted SQL:\n```sql\nSELECT SUM(\"c_4_unlinked_passenger_trips\") AS \"trips\" FROM \"data\" LIMIT 100\n```\n\nResult SHA-256: d07e151e7059f5e1aa2b86e845f76ec5d0bf44985395aed1ad87dfa18fd70b6a. Database SHA-256: 3d9f3833b821c37e408d20f293e833b0c6682b36f8891a4269b35bc52ff4aa6c.\n\nThese findings describe only the selected dataset and returned query scope. Synthetic fixtures are not official DOT findings. Geography, time support and units are not certified for cross-source comparisons; no causal inference is made."
+  },
+  "trend": {
+    "id": "db_research_turn:02b34102c7ec43e3adc6d3bc203b8854",
+    "question": "Show the annual trend and document definition",
+    "state": "completed",
+    "dataset": {
+      "columns": [
+        {
+          "column": "c_1_report_year",
+          "original": "Report Year",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_2_ntd_id",
+          "original": "NTD ID",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_3_county_fips",
+          "original": "County FIPS",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_4_unlinked_passenger_trips",
+          "original": "Unlinked Passenger Trips",
+          "type": "BIGINT"
+        }
+      ],
+      "connection_id": "db_connection:7ce170ae60544d1dbfdcf060c084d321",
+      "connection_revision": "2fc55b55-9d61-4574-83d2-8f297002e657",
+      "database_sha256": "3d9f3833b821c37e408d20f293e833b0c6682b36f8891a4269b35bc52ff4aa6c",
+      "dataset_id": "1b7e127b-bf69-5866-9a0d-1e2c80359bbb",
+      "description": "Synthetic values only. Not official NTD statistics. <script>alert('untrusted metadata')</script>",
+      "download_url": "https://data.transportation.gov/files/sample.csv",
+      "import_id": "db_import:f1680a32e94817d172fb16cf6d7773fe6257af4c",
+      "license": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "publisher": {
+        "name": "DataBridge synthetic fixture"
+      },
+      "raw_sha256": "ecf43192f09953390bdefa4426026f62c796db7c76d5e4369516e2412bda6456",
+      "retrieved_at": "2026-10-29T22:47:08.935096+00:00",
+      "rows": 4,
+      "schema_sha256": "97da293fbdab33951f6c36c343089a6c112ddcd46ecc9838faca39d9b0d8fa56",
+      "semantic_status": "publisher metadata only; cross-source geography/time/units not certified",
+      "source_id": "source:7ce170ae60544d1dbfdcf060c084d321",
+      "spatial": "Synthetic county 01001; not an agency service-area crosswalk",
+      "table": "data",
+      "temporal": "2022/2025",
+      "title": "Synthetic NTD 2022\u20132025 service fixture",
+      "version_id": "7ce170ae-6054-4d1d-bfdc-f060c084d321"
+    },
+    "evidence": {
+      "bytes": 105,
+      "completed_at": "2026-10-29T22:47:19.865389+00:00",
+      "connection_id": "db_connection:7ce170ae60544d1dbfdcf060c084d321",
+      "dataset_sha256": "3d9f3833b821c37e408d20f293e833b0c6682b36f8891a4269b35bc52ff4aa6c",
+      "fingerprint": "70f188bb6eed37fdfac4e2e1d26786dacfa5c0d02dc54ffe6086ad8ae24e1633",
+      "id": "db_query_run:jqyc89nus1n0lkq7ygsx",
+      "notebook_id": "notebook:9lybm29w0z4tc7cxhumy",
+      "parameters": {},
+      "plan_id": "db_query_plan:rvk47h3tm5oo6vepm38h",
+      "policy": "databridge-select-v1",
+      "result_sha256": "78a8f8013c516d1175324fa2a9e2b1a0fbc6e61ad92c260ddc473efd90437095",
+      "revision": "2fc55b55-9d61-4574-83d2-8f297002e657",
+      "row_count": 4,
+      "rows": [
+        {
+          "trips": 100,
+          "year": 2022
+        },
+        {
+          "trips": 150,
+          "year": 2023
+        },
+        {
+          "trips": 200,
+          "year": 2024
+        },
+        {
+          "trips": 250,
+          "year": 2025
+        }
+      ],
+      "sql": "SELECT \"c_1_report_year\" AS \"year\", SUM(\"c_4_unlinked_passenger_trips\") AS \"trips\" FROM \"data\" GROUP BY \"c_1_report_year\" ORDER BY \"c_1_report_year\" LIMIT 100",
+      "status": "success",
+      "timestamp": "2026-10-29T22:47:17.880053+00:00",
+      "version_id": "7ce170ae-6054-4d1d-bfdc-f060c084d321"
+    },
+    "verification": {
+      "method": "exact-result-cell-and-document-excerpt",
+      "result_sha256": "78a8f8013c516d1175324fa2a9e2b1a0fbc6e61ad92c260ddc473efd90437095"
+    },
+    "chart": {
+      "year_column": "year",
+      "value_column": "trips",
+      "points": [
+        {
+          "year": 2022,
+          "value": "100"
+        },
+        {
+          "year": 2023,
+          "value": "150"
+        },
+        {
+          "year": 2024,
+          "value": "200"
+        },
+        {
+          "year": 2025,
+          "value": "250"
+        }
+      ],
+      "change": "150"
+    },
+    "answer": "Database evidence for Synthetic NTD 2022\u20132025 service fixture.\n\nThe executed query returned these verified values:\n\n- Result row 1, trips: 100.\n\n- Result row 1, year: 2022.\n\n- Result row 2, trips: 150.\n\n- Result row 2, year: 2023.\n\n- Result row 3, trips: 200.\n\n- Result row 3, year: 2024.\n\n- Result row 4, trips: 250.\n\n- Result row 4, year: 2025.\n\nAcross the returned years 2022 to 2025, trips changed by 150. Missing years are not treated as zero.\n\nNotebook document evidence (distinct from database results): Synthetic transit fixture: unlinked passenger trips count boardings, not unique people. [source:h5wcoo227mtxixxvh9pb; snapshot SHA-256 01158cbf0c2967e637cf89b0c847c2f35614a7f181edfcb19f8e107495450087]\n\nAttribution: dataset 1b7e127b-bf69-5866-9a0d-1e2c80359bbb; immutable version 7ce170ae-6054-4d1d-bfdc-f060c084d321; evidence db_query_run:jqyc89nus1n0lkq7ygsx; query plan db_query_plan:rvk47h3tm5oo6vepm38h.\n\nExecuted SQL:\n```sql\nSELECT \"c_1_report_year\" AS \"year\", SUM(\"c_4_unlinked_passenger_trips\") AS \"trips\" FROM \"data\" GROUP BY \"c_1_report_year\" ORDER BY \"c_1_report_year\" LIMIT 100\n```\n\nResult SHA-256: 78a8f8013c516d1175324fa2a9e2b1a0fbc6e61ad92c260ddc473efd90437095. Database SHA-256: 3d9f3833b821c37e408d20f293e833b0c6682b36f8891a4269b35bc52ff4aa6c.\n\nThese findings describe only the selected dataset and returned query scope. Synthetic fixtures are not official DOT findings. Geography, time support and units are not certified for cross-source comparisons; no causal inference is made."
+  }
+}

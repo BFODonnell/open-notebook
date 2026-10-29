@@ -25,6 +25,17 @@ class ThreadState(TypedDict):
     context: Optional[str]
     context_config: Optional[dict]
     model_override: Optional[str]
+    database_reply: Optional[dict]
+
+
+def database_reply(state: ThreadState) -> dict:
+    from langchain_core.messages import AIMessage
+
+    # All I/O already ran in the async research subgraph. Preserve the existing
+    # SQLite conversation/checkpointer without another model call or event loop.
+    reply = state.get("database_reply")
+    assert reply is not None
+    return {"messages": AIMessage(**reply), "database_reply": None}
 
 
 def call_model_with_messages(state: ThreadState, config: RunnableConfig) -> dict:
@@ -100,6 +111,10 @@ memory = SqliteSaver(conn)
 
 agent_state = StateGraph(ThreadState)
 agent_state.add_node("agent", call_model_with_messages)
-agent_state.add_edge(START, "agent")
+agent_state.add_node("database_response", database_reply)
+agent_state.add_conditional_edges(
+    START, lambda state: "database_response" if state.get("database_reply") else "agent"
+)
 agent_state.add_edge("agent", END)
+agent_state.add_edge("database_response", END)
 graph = agent_state.compile(checkpointer=memory)

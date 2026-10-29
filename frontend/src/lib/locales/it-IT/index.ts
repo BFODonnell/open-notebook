@@ -1,6 +1,21 @@
 import type { TranslationShape } from '../en-US';
 
 export const itIT = {
+  research: {
+    title: "Database research",
+    loading: "Loading research evidence...",
+    error: "Research action failed. The dataset or approval may have changed, or a service is unavailable. Inspect the current status and review a new plan when appropriate.",
+    status: "Status",
+    version: "Immutable dataset version",
+    expiry: "Approval expires",
+    notice: "Review the exact SQL and dataset version before approving. No query is executed automatically.",
+    review: "Review SQL / renew approval",
+    approve: "Approve and execute through MCP",
+    resume: "Resume verified answer (no SQL rerun)",
+    trend: "Returned annual values",
+    chartNotice: "Bars show the magnitude of returned values; labels retain the sign. Missing years are not zero. Units and coverage require publisher review.",
+    provenance: "Inspect query evidence and provenance",
+  },
   explorer: {
     title: "Open Data Explorer",
     intro: "Find public datasets in Data.gov, validate a resource, and import it into an immutable notebook dataset.",
@@ -61,7 +76,7 @@ export const itIT = {
     version: "Dataset version",
     query: "Query dataset through MCP",
     openNotebook: "Open notebook documentation",
-    chatBoundary: "Schema documentation is attached to this notebook. Conversational database analysis is not implemented yet; use the explicit query review below.",
+    chatBoundary: "Schema documentation is attached to this notebook. When conversational research is enabled, ask about this dataset in notebook chat and explicitly review and approve its SQL. You can also use the query review below.",
     provenance: "Inspect provenance and processing history",
     completed: "Operation completed",
   },

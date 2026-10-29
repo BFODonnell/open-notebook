@@ -18,6 +18,7 @@ export const queryClient = new QueryClient({
 })
 
 export const QUERY_KEYS = {
+  databridgeResearch: ['databridge-research'] as const,
   databridgeCatalog: ['databridge', 'catalog'] as const,
   databridgeMCP: ['databridge', 'mcp'] as const,
   databridgeUsage: ['databridge', 'usage'] as const,

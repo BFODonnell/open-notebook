@@ -27,6 +27,9 @@ class ChatMessage(BaseModel):
     type: str = Field(..., description="Message type (human|ai)")
     content: str = Field(..., description="Message content")
     timestamp: Optional[str] = Field(None, description="Message timestamp")
+    database_turn_id: Optional[str] = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
 
 
 class SuccessResponse(BaseModel):
@@ -89,6 +92,9 @@ def extract_chat_messages(raw_messages: Iterable[Any]) -> List[ChatMessage]:
                 type=msg.type if hasattr(msg, "type") else "unknown",
                 content=msg.content if hasattr(msg, "content") else str(msg),
                 timestamp=None,  # LangChain messages don't have timestamps by default
+                database_turn_id=getattr(msg, "additional_kwargs", {}).get(
+                    "database_turn_id"
+                ),
             )
         )
     return messages

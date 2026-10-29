@@ -1,0 +1,425 @@
+{
+  "date": "2026-10-29",
+  "scope": "Synthetic public data and deterministic model; real application, worker, MCP and persistent services",
+  "runs": {
+    "seed.log": {
+      "mode": "seed",
+      "passed": 48,
+      "checks": [
+        "Research routes retain application authentication",
+        "Existing notebook chat works before any dataset is imported",
+        "Search, inspect, preview and Import complete through DataBridge's real worker",
+        "Current notebook chat routes database question to research workflow",
+        "New import is available in the same pre-existing chat without registration or reload",
+        "Generated SQL is only a proposal; planning does not execute MCP",
+        "Review shows Phase 2 canonical authorized SQL and bounded limit",
+        "Approval bearer is absent from checkpoint and durable research response",
+        "Natural-language total executes through real MCP and returns exactly 700",
+        "Answer numeric claims are checked against the exact stored result hash",
+        "Answer identifies immutable dataset, executed query, evidence and database hash",
+        "Existing evidence viewer returns the same query result attribution",
+        "One-time approval cannot execute twice",
+        "Current notebook chat routes database question to research workflow",
+        "Verified annual trend shows four known years and deterministic change of 150",
+        "Answer combines database cells and an independently verified notebook excerpt",
+        "Synthetic findings carry explicit provenance and causal/compatibility caveats",
+        "Current notebook chat routes database question to research workflow",
+        "unsafe query is rejected without findings",
+        "Current notebook chat routes database question to research workflow",
+        "outside notebook dataset is rejected without findings",
+        "Current notebook chat routes database question to research workflow",
+        "join two tables is rejected without findings",
+        "Current notebook chat routes database question to research workflow",
+        "incompatible units comparison is rejected without findings",
+        "Current notebook chat routes database question to research workflow",
+        "weather caused transit changes is rejected without findings",
+        "Current notebook chat routes database question to research workflow",
+        "missing denominator is rejected without findings",
+        "Current notebook chat routes database question to research workflow",
+        "Empty query explicitly reports insufficient evidence rather than inventing zero",
+        "Current notebook chat routes database question to research workflow",
+        "Fabricated model numeric claim is rejected while real evidence remains intact",
+        "Current notebook chat routes database question to research workflow",
+        "Expired approval never reaches successful MCP execution",
+        "Current notebook chat routes database question to research workflow",
+        "Invalid approval token cannot authorize model-generated SQL",
+        "Research records require both the correct notebook and chat session",
+        "Current notebook chat routes database question to research workflow",
+        "Provider failure after execution saves evidence without inventing an answer",
+        "Explicit synthesis retry uses saved evidence without rerunning SQL",
+        "Current notebook chat routes database question to research workflow",
+        "New dataset version invalidates an earlier conversational approval",
+        "Historical answer remains attributed to its original immutable version",
+        "Current notebook chat routes database question to research workflow",
+        "Document/general chat still uses the original LangGraph model node",
+        "Actual LiteLLM usage persists for both research phases with notebook/session attribution",
+        "Chat research evidence contains no catalog or MCP service credentials"
+      ]
+    },
+    "outage.log": {
+      "mode": "outage",
+      "passed": 3,
+      "checks": [
+        "Current notebook chat routes database question to research workflow",
+        "Real broker outage yields failed conversation state without fabricated results",
+        "Broker failure retains normal Phase 2 query audit evidence"
+      ]
+    },
+    "recover.log": {
+      "mode": "recover",
+      "passed": 1,
+      "checks": [
+        "Service recovery requires fresh review/approval and returns verified results"
+      ]
+    },
+    "recovery.log": {
+      "mode": "recovery",
+      "passed": 6,
+      "checks": [
+        "Planning provider outage leaves existing chat history intact",
+        "Current notebook chat routes database question to research workflow",
+        "Disabled connection invalidates conversational approval before execution",
+        "Current notebook chat routes database question to research workflow",
+        "Interrupted research recovers the unique durable MCP evidence without replay",
+        "Completed recovery cannot consume another query approval"
+      ]
+    },
+    "restart.log": {
+      "mode": "restart",
+      "passed": 6,
+      "checks": [
+        "Research answer, exact version and evidence survive full stack restart",
+        "Research answer, exact version and evidence survive full stack restart",
+        "Verified database answer remains in the existing LangGraph conversation",
+        "Post-restart review invalidates the old one-time approval",
+        "Freshly approved query executes after restart",
+        "Research token/cost records survive proxy and PostgreSQL restart"
+      ]
+    },
+    "p3-seed.log": {
+      "mode": "seed",
+      "passed": 51,
+      "checks": [
+        "Explorer retains upstream application authentication",
+        "Official v4-shaped search and agency/topic filters",
+        "Cursor pagination uses after rather than page offsets",
+        "Dataset metadata keeps publisher and report period",
+        "Unsupported Excel resource is explicitly classified",
+        "Unsafe publisher target is not importable",
+        "HTML masquerade rejected by real download preflight",
+        "Blocked redirect rejected by real download preflight",
+        "Oversize transfer rejected by real download preflight",
+        "Catalog rate limit is visible without leaking API credentials",
+        "CSV real HTTPS transfer and isolated parser preview",
+        "CSV preserves leading-zero agency identifiers",
+        "CSV import request is idempotent",
+        "CSV executed by the real background worker",
+        "CSV provenance binds downloaded bytes to immutable publication",
+        "CSV observable durable processing stages",
+        "Imported dataset returns exact synthetic total through real MCP",
+        "CSV imported provenance is notebook scoped",
+        "CSV automatically attaches documentation without embedding raw rows",
+        "JSON real HTTPS transfer and isolated parser preview",
+        "JSON preserves leading-zero agency identifiers",
+        "JSON import request is idempotent",
+        "JSON executed by the real background worker",
+        "JSON provenance binds downloaded bytes to immutable publication",
+        "JSON observable durable processing stages",
+        "Imported dataset returns exact synthetic total through real MCP",
+        "JSON imported provenance is notebook scoped",
+        "JSON automatically attaches documentation without embedding raw rows",
+        "PARQUET real HTTPS transfer and isolated parser preview",
+        "PARQUET preserves leading-zero agency identifiers",
+        "PARQUET import request is idempotent",
+        "PARQUET executed by the real background worker",
+        "PARQUET provenance binds downloaded bytes to immutable publication",
+        "PARQUET observable durable processing stages",
+        "Imported dataset returns exact synthetic total through real MCP",
+        "PARQUET imported provenance is notebook scoped",
+        "PARQUET automatically attaches documentation without embedding raw rows",
+        "ZIP real HTTPS transfer and isolated parser preview",
+        "ZIP preserves leading-zero agency identifiers",
+        "ZIP import request is idempotent",
+        "ZIP executed by the real background worker",
+        "ZIP provenance binds downloaded bytes to immutable publication",
+        "ZIP observable durable processing stages",
+        "Imported dataset returns exact synthetic total through real MCP",
+        "ZIP imported provenance is notebook scoped",
+        "ZIP automatically attaches documentation without embedding raw rows",
+        "Research-agent interface exposes active notebook versions and the DB-DATA-02 boundary",
+        "Other notebook sees no imported database records",
+        "Interrupted registration reconciles the same immutable version",
+        "Data.gov API key never reaches publisher requests",
+        "No raw/staging files remain after successful imports"
+      ]
+    },
+    "p3-reliability-changed.log": {
+      "mode": "changed",
+      "passed": 2,
+      "checks": [
+        "Source mutation after preview fails before publication",
+        "Changed source never becomes an immutable published dataset"
+      ]
+    },
+    "p3-reliability-cancel.log": {
+      "mode": "cancel",
+      "passed": 1,
+      "checks": [
+        "Running download cancellation stops before publication"
+      ]
+    },
+    "p3-reliability-outage.log": {
+      "mode": "outage",
+      "passed": 1,
+      "checks": [
+        "Broker outage retains publication but never marks import ready"
+      ]
+    },
+    "p3-reliability-outage-recover.log": {
+      "mode": "outage-recover",
+      "passed": 2,
+      "checks": [
+        "Restored broker reconciles the existing immutable version",
+        "Registration retry does not redownload source bytes"
+      ]
+    },
+    "p3-reliability-interrupt-start.log": {
+      "mode": "interrupt-start",
+      "passed": 1,
+      "checks": [
+        "Real worker is downloading when interruption is requested"
+      ]
+    },
+    "p3-reliability-interrupt-recover.log": {
+      "mode": "interrupt-recover",
+      "passed": 2,
+      "checks": [
+        "SIGKILL preserves durable interrupted-worker state across restart",
+        "Expired interrupted job resumes through the real worker with the same version identity"
+      ]
+    },
+    "p3-reliability-revocation.log": {
+      "mode": "revocation",
+      "passed": 2,
+      "checks": [
+        "Recovery cannot override administrator connection revocation",
+        "Revoked connection remains disabled after recovery attempt"
+      ]
+    },
+    "p3-acceptance-restart.log": {
+      "mode": "restart",
+      "passed": 9,
+      "checks": [
+        "Version and provenance survive application/worker/database restart",
+        "Imported dataset returns exact synthetic total through real MCP",
+        "Version and provenance survive application/worker/database restart",
+        "Imported dataset returns exact synthetic total through real MCP",
+        "Version and provenance survive application/worker/database restart",
+        "Imported dataset returns exact synthetic total through real MCP",
+        "Version and provenance survive application/worker/database restart",
+        "Imported dataset returns exact synthetic total through real MCP",
+        "Notebook dataset discovery persists without claiming conversational analysis"
+      ]
+    },
+    "p2-acceptance-seed.log": {
+      "mode": "seed",
+      "passed": 65,
+      "checks": [
+        "Application authentication required",
+        "Application password alone cannot administer database connections",
+        "Publication retry safely reconciles existing manifest/registry",
+        "Publication retry safely reconciles existing manifest/registry",
+        "Immutable content versions, stable schema identity",
+        "Publication rejects path traversal and version reassignment",
+        "dbhub real initialize/list_tools and explicit signature approval",
+        "dbhub real schema discovery",
+        "dbhub schema respects database/connection column scope",
+        "dbhub real MCP result",
+        "Canonical evidence hash",
+        "dbhub connection and evidence notebook scope enforced",
+        "dbhub token encrypted at rest",
+        "dbhub public registry excludes credential values",
+        "dbhub application row cap enforced before execution",
+        "dbhub writes, multi-statements, files, hidden columns/catalogs, functions, comments, CTEs and joins rejected",
+        "dbhub rejected SQL has hash-only audit records",
+        "toolbox real initialize/list_tools and explicit signature approval",
+        "toolbox real schema discovery",
+        "toolbox schema respects database/connection column scope",
+        "toolbox real MCP result",
+        "Canonical evidence hash",
+        "toolbox connection and evidence notebook scope enforced",
+        "toolbox token encrypted at rest",
+        "toolbox public registry excludes credential values",
+        "Toolbox rejects parameter injection and extra arguments",
+        "sample-wide bounded failure (byte cap or database timeout)",
+        "sample-slow bounded failure (byte cap or database timeout)",
+        "duckdb real initialize/list_tools and explicit signature approval",
+        "duckdb real schema discovery",
+        "duckdb schema respects database/connection column scope",
+        "duckdb real MCP result",
+        "Canonical evidence hash",
+        "duckdb connection and evidence notebook scope enforced",
+        "duckdb token encrypted at rest",
+        "duckdb public registry excludes credential values",
+        "duckdb application row cap enforced before execution",
+        "duckdb writes, multi-statements, files, hidden columns/catalogs, functions, comments, CTEs and joins rejected",
+        "duckdb rejected SQL has hash-only audit records",
+        "Concurrent approval is executed exactly once",
+        "Wrong, expired and replayed approvals cannot execute",
+        "Disabling, updating or reapproving invalidates pending execution",
+        "dbhub wrong credential fails without disclosure",
+        "dbhub real MCP result",
+        "Canonical evidence hash",
+        "toolbox wrong credential fails without disclosure",
+        "toolbox real MCP result",
+        "Canonical evidence hash",
+        "duckdb wrong credential fails without disclosure",
+        "duckdb real MCP result",
+        "Canonical evidence hash",
+        "dbhub independently authenticates MCP transport",
+        "toolbox-gateway independently authenticates MCP transport",
+        "duckdb-broker independently authenticates MCP transport",
+        "DBHub/database defense rejects DELETE",
+        "DBHub/database defense rejects SELECT",
+        "DBHub database statement timeout is active",
+        "DuckDB broker rejects external reads independently of application",
+        "Unknown immutable version is unavailable",
+        "duckdb-version-two real MCP result",
+        "Canonical evidence hash",
+        "duckdb real MCP result",
+        "Canonical evidence hash",
+        "Old and new immutable database selections coexist",
+        "Evidence binds each query to the exact published database hash"
+      ]
+    },
+    "p2-acceptance-outage.log": {
+      "mode": "outage",
+      "passed": 1,
+      "checks": [
+        "outage produces durable failure, no fabricated rows"
+      ]
+    },
+    "p2-acceptance-drift.log": {
+      "mode": "drift",
+      "passed": 1,
+      "checks": [
+        "drift produces durable failure, no fabricated rows"
+      ]
+    },
+    "p2-acceptance-restart.log": {
+      "mode": "restart",
+      "passed": 8,
+      "checks": [
+        "dbhub real MCP result",
+        "Canonical evidence hash",
+        "toolbox real MCP result",
+        "Canonical evidence hash",
+        "duckdb real MCP result",
+        "Canonical evidence hash",
+        "Evidence, version and hashes survive application/SurrealDB/broker restart",
+        "Immutable versions survive restart"
+      ]
+    },
+    "p1-acceptance-seed.log": {
+      "mode": "seed",
+      "passed": 17,
+      "checks": [
+        "usage retains upstream password authentication",
+        "application key cannot administer gateway keys",
+        "notebook question reaches real LiteLLM through Esperanto and LangGraph",
+        "all four provider-reported token categories persist",
+        "canonical proxy cost uses USD per-token units",
+        "request, notebook, session and task attribution persists",
+        "usage projection contains no keys, provider URL or prompts",
+        "UTC date filtering excludes outside-window records",
+        "provider failure returns a useful typed API error",
+        "failed provider call is attempted exactly once without SDK/router retries",
+        "failed provider attempt never fabricates free cost or usage",
+        "failed chat turn is removed from persistent checkpoint",
+        "limited key makes its first billable request",
+        "real persistent key budget denies subsequent requests",
+        "usage excludes requests made with another key",
+        "exhausted application budget produces an actionable chat error",
+        "usage remains readable when the application budget is exhausted"
+      ]
+    },
+    "p1-acceptance-restart.log": {
+      "mode": "restart",
+      "passed": 5,
+      "checks": [
+        "token/cost/attribution record survives PostgreSQL and LiteLLM restart",
+        "application spend is not reset by key provisioning",
+        "budget denial survives database and proxy restart",
+        "model bootstrap is idempotent after application restart",
+        "existing notebook and LangGraph conversation survive restart"
+      ]
+    },
+    "p1-acceptance-unpriced.log": {
+      "mode": "unpriced",
+      "passed": 4,
+      "checks": [
+        "environment change selects a new deployment default",
+        "changed default reaches provider without manual model setup",
+        "unknown model pricing remains unavailable while real usage persists",
+        "model change preserves historical attribution"
+      ]
+    },
+    "smoke.log": {
+      "passed": 7,
+      "checks": [
+        "API health",
+        "existing provider registry reachable",
+        "notebook create/read/update",
+        "text source submitted and processed by real worker",
+        "uploaded document processed and original download preserved",
+        "source context and existing chat session CRUD",
+        "synthetic notebook/source cleanup"
+      ]
+    }
+  },
+  "native_duckdb_defenses": {
+    "passed": 6
+  },
+  "postgres_role_denials": {
+    "expected_failures": 4,
+    "exit_codes": [
+      1,
+      1,
+      1,
+      2
+    ]
+  },
+  "browser": {
+    "status": "outstanding",
+    "reason": "Browser host unavailable; native fallback stopped because current URL could not be determined confidently enough to enforce policy."
+  },
+  "live_data_gov_ntd": "not executed",
+  "live_gpt6_astra": "not executed",
+  "regression_suites": {
+    "backend_databridge": {
+      "passed": 1248,
+      "warnings": 2
+    },
+    "backend_base": {
+      "passed": 1098,
+      "skipped": 23,
+      "warnings": 2
+    },
+    "frontend": {
+      "passed": 205,
+      "files": 40
+    },
+    "ruff": "passed",
+    "format": "200 files formatted",
+    "mypy": "200 source files passed",
+    "frontend_lint": {
+      "errors": 0,
+      "existing_warnings": 7
+    },
+    "frontend_build": "passed",
+    "docker_source_build": "passed",
+    "final_built_image_recovery": {
+      "passed": 6
+    }
+  }
+}

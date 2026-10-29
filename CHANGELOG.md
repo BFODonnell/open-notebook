@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Opt-in DataBridge notebook research discovers imported datasets in existing chat, proposes authorized SQL for explicit review/approval, and returns verified result cells, document quotes, immutable-version provenance and bounded annual trends. Durable evidence supports synthesis recovery without replaying SQL; existing model provisioning and usage accounting are preserved.
 - **DataBridge Open Data Explorer:** direct Data.gov catalog search and resource validation, background CSV/JSON/Parquet and bounded single-file ZIP imports, immutable DuckDB publication, notebook schema documentation, scoped MCP queries, provenance and interrupted-job recovery. Opt-in deployment; conversational database analysis remains a subsequent phase.
 - Opt-in DataBridge MCP connections for DBHub/PostgreSQL, curated Google Toolbox tools and isolated immutable DuckDB versions. Adds administrator capability approval, notebook-scoped read-only query review, bounded execution, persistent audit/evidence and Settings controls; other database engines remain uncertified.
 - Opt-in DataBridge deployment with a persistent LiteLLM/PostgreSQL gateway, environment-managed Esperanto chat defaults, scoped usage accounting and a Settings usage panel. Includes budget enforcement, explicit unavailable pricing, and isolated acceptance fixtures; existing direct providers remain available and are outside gateway metering.

@@ -71,8 +71,47 @@ Both future adapters must emit the same catalog/resource snapshot, bounded raw
 download, checksum, schema mapping and immutable publication contract. Neither
 adds an MCP server. **Phase 2 SQL permits one table only**, so cross-source joins
 require a separate policy/planner review and tests; they are not delivered in P3.
-DB-DATA-02 conversational discovery/planning/query/synthesis is also still pending.
+Phase 4 adds bounded conversational discovery/planning/approval/query/synthesis;
+it does not authorize general cross-source SQL or certify these live adapters.
 
 The original DBHub certification roadmap remains SQL Server, PostgreSQL, MySQL,
 MariaDB, SQLite and Oracle. This phase adds no certification claim beyond the
 previously documented subset and the isolated DuckDB import/query checks.
+
+## Phase 4 investigation: reviewed analytical materialization
+
+The approved design's preferred population denominator remains **PEP**, using one
+consistent 2025 vintage for 2022-2025 where the exact geography and estimates are
+available. If unavailable, restrict to the approved overlapping 2022-2024 years
+and disclose the gap. The ACS example above documents an adapter/temporal pitfall;
+it is not a silent replacement for that PEP decision. Live availability is still
+unverified. The owner now has a catalog key; it must be configured separately from
+fixture DNS/TLS before live acquisition can be tested.
+
+Prefer a reviewed materialized table over enabling joins in chat. The relationship
+contract for a subsequent implementation must include:
+
+| Input or relationship | Required validation before publication |
+|---|---|
+| NTD facts | Explicit unique agency/mode/type-of-service/report-period key; identify total vs component rows; exclude double counting; store measure definitions and units. |
+| Agency to Census geography | Versioned crosswalk keyed by stable NTD ID and geography code/vintage, with validity dates and documented allocation weights. Names alone are forbidden. Reject duplicate/conflicting keys and allocations whose weights do not sum to the reviewed total. |
+| PEP denominator | Same approved geography support and annual vintage across selected years; one population per geography/year; positive denominator; reject missing or incompatible coverage. Do not equate service coverage to city/county residence without a reviewed rule. |
+| NOAA observations | Station/date/variable key, geographic mapping and weights, QC flags, completeness threshold and exact unit conversions. Preserve missing days; do not fill them with zero. |
+| Annual alignment | Explicit annual support for all inputs; reject fiscal/calendar mismatches, partial years, nonoverlapping dates or unreviewed aggregation. |
+| Published analytical table | Immutable input version IDs/hashes, crosswalk version, transformation hash, reviewer decision, validation totals, excluded coverage and output schema/unit definitions in provenance. Same P2 quotas, staging checks and publication interface. |
+
+One possible future output grain is a reviewed service-geography/year with separate
+columns for boardings, population, boardings-per-resident (never unique riders),
+weather summaries and coverage flags. This is a proposed schema, not a computed
+comparison or an enabled execution path. Many-to-many expansion, name-based joins,
+zero denominators, mixed vintages, incompatible units and insufficient station
+coverage must fail before publication. The P4 synthetic acceptance rejects join
+requests, incompatible units, missing denominators and weather-causality requests;
+its annual transit trend alone is not evidence of geographic compatibility.
+
+No narrow join extension was enabled: the current parser, table allowlists and
+read-only MCP boundary remain unchanged. The next review should compare materialized
+tables against allowlisted foreign-key equijoins with explicit cardinality and
+negative escape tests. General joins remain outside the authorized scope. Until
+those checks pass, present separate transit/population/weather descriptions and
+explicit incompatibility rather than per-capita or causal claims.

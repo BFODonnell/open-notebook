@@ -1,6 +1,7 @@
 'use client'
 
 import { memo, useCallback, useState, useRef, useEffect, useId } from 'react'
+import { ResearchTurn } from '@/components/databridge/ResearchTurn'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -157,6 +158,7 @@ export function ChatPanel({
                 <ChatMessage
                   key={message.id}
                   message={message}
+                  sessionId={currentSessionId ?? undefined}
                   notebookId={notebookId}
                   onReferenceClick={handleReferenceClick}
                 />
@@ -317,6 +319,7 @@ function ChatComposer({
 // Single chat message row. Memoized so historical messages don't re-render when
 // unrelated state (e.g. the composer input) changes.
 interface ChatMessageProps {
+  sessionId?: string
   message: SourceChatMessage
   notebookId?: string
   onReferenceClick: (type: string, id: string) => void
@@ -324,6 +327,7 @@ interface ChatMessageProps {
 
 const ChatMessage = memo(function ChatMessage({
   message,
+  sessionId,
   notebookId,
   onReferenceClick
 }: ChatMessageProps) {
@@ -357,6 +361,7 @@ const ChatMessage = memo(function ChatMessage({
             <p className="text-sm break-all">{message.content}</p>
           )}
         </div>
+        {message.database_turn_id && notebookId && sessionId && <ResearchTurn key={message.database_turn_id + sessionId} id={message.database_turn_id} notebookId={notebookId} sessionId={sessionId} />}
         {message.type === 'ai' && (
           <MessageActions
             content={message.content}

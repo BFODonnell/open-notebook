@@ -1,0 +1,3 @@
+services:
+  fixture:
+    command: [/app/.venv/bin/uvicorn, scripts.databridge_p4.fixture:app, --host, 0.0.0.0, --port, '8080']

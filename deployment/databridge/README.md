@@ -122,3 +122,9 @@ Data.gov discovery, bounded automated imports, notebook attachment, immutable
 publication, provenance and interrupted-job recovery. It layers on Phase 2 and
 preserves the existing model gateway. See the [Phase 3 report](../../docs/databridge/PHASE_3_REPORT.md)
 for fixture acceptance and outstanding live/browser checks.
+
+## Phase 4 extension
+
+The [conversational research guide](research/README.md) enables imported-dataset
+discovery in existing notebook chat, explicit SQL review/approval, verified answers,
+provenance and synthesis recovery. It preserves all earlier deployment layers.

@@ -1,6 +1,7 @@
 """Durable import state machine, publication and automatic scoped registration."""
 
 import json
+import os
 import secrets
 from dataclasses import asdict
 from datetime import datetime, timedelta, timezone
@@ -457,5 +458,8 @@ async def notebook_context(notebook_id: str) -> dict:
         "notebook_id": notebook_id,
         "datasets": datasets,
         "sql_policy": "single-table SELECT; explicit query approval required",
-        "conversational_analysis": False,
+        "conversational_analysis": os.getenv(
+            "DATABRIDGE_RESEARCH_ENABLED", "false"
+        ).lower()
+        == "true",
     }
