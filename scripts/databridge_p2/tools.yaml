@@ -1,0 +1,40 @@
+kind: source
+name: fixture
+type: postgres
+host: fixture-pg
+port: 5432
+database: analytics
+user: toolbox_reader
+password: p2-toolbox-db-only
+---
+kind: tool
+name: sample-total
+type: postgres-sql
+source: fixture
+description: Sum the synthetic values above the bound parameter.
+statement: SELECT SUM(value) AS total FROM sample WHERE value >= $1 LIMIT 1
+parameters:
+  - name: minimum
+    type: integer
+    description: Minimum included synthetic value.
+---
+kind: tool
+name: sample-schema
+type: postgres-sql
+source: fixture
+description: Inspect the approved sample columns.
+statement: SELECT table_name, column_name, data_type FROM information_schema.columns WHERE table_schema='public' AND table_name='sample' AND column_name IN ('value','label') LIMIT 10
+---
+kind: tool
+name: sample-slow
+type: postgres-sql
+source: fixture
+description: Synthetic timeout fixture; database role cancels at one second.
+statement: SELECT pg_sleep(4) LIMIT 1
+---
+kind: tool
+name: sample-wide
+type: postgres-sql
+source: fixture
+description: Synthetic response-limit fixture.
+statement: SELECT repeat('x',20000) AS value LIMIT 1

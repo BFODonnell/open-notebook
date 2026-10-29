@@ -50,7 +50,10 @@ dependencies = [
 
 [project.optional-dependencies]
 databridge = [
+    "duckdb==1.5.6",
+    "jsonschema>=4.25,<5",
     "mcp==1.28.1",
+    "sqlglot==30.25.0",
 ]
 
 [tool.setuptools]

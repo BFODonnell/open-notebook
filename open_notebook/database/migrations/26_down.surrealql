@@ -1,0 +1,4 @@
+REMOVE TABLE IF EXISTS db_query_run;
+REMOVE TABLE IF EXISTS db_query_plan;
+REMOVE TABLE IF EXISTS db_dataset_version;
+REMOVE TABLE IF EXISTS db_connection;

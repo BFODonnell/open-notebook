@@ -109,3 +109,8 @@ References: [LiteLLM deployment](https://docs.litellm.ai/docs/proxy/docker_quick
 [virtual keys](https://docs.litellm.ai/docs/proxy/virtual_keys), and
 [OpenAI model documentation](https://developers.openai.com/api/docs/models/gpt-6-astra).
 Exact behavior is tested against the pinned image, not inferred from latest docs.
+## Phase 2 extension
+
+The optional [MCP deployment guide](mcp/README.md) documents the Phase 2 overlay,
+connection administration, SQL policy, immutable dataset versions and recovery.
+The Phase 1 instructions above remain authoritative for the model gateway.

@@ -1,0 +1,39 @@
+services:
+  open-notebook:
+    image: databridge-p2-tests:local
+    working_dir: /workspace
+    command: [/app/.venv/bin/uvicorn, api.main:app, --host, 0.0.0.0, --port, '5055']
+    volumes:
+      - .:/workspace:ro
+      - notebook-data:/workspace/data
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:5055/health', timeout=5)"]
+  fixture-pg:
+    image: postgres:17-alpine@sha256:742f40ea20b9ff2ff31db5458d127452988a2164df9e17441e191f3b72252193
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: p2-synthetic-admin-only
+      POSTGRES_DB: analytics
+    volumes: [./scripts/databridge_p2/postgres.sql:/docker-entrypoint-initdb.d/01.sql:ro, synthetic-pg:/var/lib/postgresql/data]
+    networks: [mcp, toolbox-private]
+    mem_limit: 512m
+    healthcheck:
+      test: [CMD, pg_isready, -U, postgres, -d, analytics]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  dbhub:
+    depends_on:
+      fixture-pg: {condition: service_healthy}
+  toolbox:
+    depends_on:
+      fixture-pg: {condition: service_healthy}
+  fixture:
+    image: databridge-p0-baseline:local
+    working_dir: /workspace
+    command: [/app/.venv/bin/uvicorn, scripts.databridge_p1.fixture:app, --host, 0.0.0.0, --port, '8080']
+    volumes: [.:/workspace:ro]
+    networks: [egress]
+    mem_limit: 256m
+volumes:
+  synthetic-pg:

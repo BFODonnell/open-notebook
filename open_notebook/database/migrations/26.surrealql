@@ -1,0 +1,26 @@
+-- DataBridge metadata only; analytical files and gateway ledger stay separate.
+DEFINE TABLE db_connection SCHEMAFULL;
+DEFINE FIELD spec ON db_connection FLEXIBLE TYPE object;
+DEFINE FIELD encrypted_token ON db_connection TYPE option<string>;
+DEFINE FIELD revision ON db_connection TYPE string;
+DEFINE FIELD approved_fingerprint ON db_connection TYPE option<string>;
+DEFINE FIELD approved_tools ON db_connection FLEXIBLE TYPE array<object> DEFAULT [];
+DEFINE FIELD health ON db_connection TYPE string;
+DEFINE FIELD last_test ON db_connection TYPE option<string>;
+DEFINE FIELD created ON db_connection TYPE option<datetime>;
+DEFINE FIELD updated ON db_connection TYPE option<datetime>;
+DEFINE TABLE db_dataset_version SCHEMAFULL;
+DEFINE FIELD manifest ON db_dataset_version FLEXIBLE TYPE object;
+DEFINE FIELD created ON db_dataset_version TYPE option<datetime>;
+DEFINE FIELD updated ON db_dataset_version TYPE option<datetime>;
+DEFINE TABLE db_query_plan SCHEMAFULL;
+DEFINE FIELD payload ON db_query_plan FLEXIBLE TYPE object;
+DEFINE FIELD approval_hash ON db_query_plan TYPE string;
+DEFINE FIELD expires_at ON db_query_plan TYPE string;
+DEFINE FIELD state ON db_query_plan TYPE string;
+DEFINE FIELD created ON db_query_plan TYPE option<datetime>;
+DEFINE FIELD updated ON db_query_plan TYPE option<datetime>;
+DEFINE TABLE db_query_run SCHEMAFULL;
+DEFINE FIELD payload ON db_query_run FLEXIBLE TYPE object;
+DEFINE FIELD created ON db_query_run TYPE option<datetime>;
+DEFINE FIELD updated ON db_query_run TYPE option<datetime>;

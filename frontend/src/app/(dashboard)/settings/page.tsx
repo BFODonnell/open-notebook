@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { RefreshCw } from 'lucide-react'
 import { useTranslation } from '@/lib/hooks/use-translation'
 import { UsagePanel } from '@/components/databridge/UsagePanel'
+import { ConnectionsPanel } from '@/components/databridge/ConnectionsPanel'
 
 export default function SettingsPage() {
   const { t } = useTranslation()
@@ -26,6 +27,7 @@ export default function SettingsPage() {
 
             <SettingsForm />
             <UsagePanel />
+            <ConnectionsPanel />
           </div>
         </div>
       </div>

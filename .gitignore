@@ -156,6 +156,9 @@ docker-compose.override.yml
 screenshot-*.png
 history.txt
 
+# Operator-owned DataBridge database credentials/configs; never commit.
+/.databridge-private/
+
 # oss-maintainer local state
 .maintainer/profile.local.toml
 .maintainer/state/

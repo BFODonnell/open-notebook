@@ -1,0 +1,8 @@
+[project]
+name = "databridge-duckdb-broker"
+version = "0.1.0"
+requires-python = ">=3.12,<3.13"
+dependencies = ["mcp==1.28.1", "sqlglot==30.25.0", "uvicorn>=0.30,<1"]
+
+[tool.uv]
+package = false

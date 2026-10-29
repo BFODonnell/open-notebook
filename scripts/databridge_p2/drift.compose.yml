@@ -1,0 +1,3 @@
+services:
+  dbhub:
+    volumes: [./scripts/databridge_p2/dbhub-drift.toml:/config/dbhub.toml:ro]

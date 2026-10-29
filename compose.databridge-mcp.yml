@@ -1,0 +1,85 @@
+# Layer onto compose.databridge.yml. Config files/targets are operator-approved.
+services:
+  open-notebook:
+    environment:
+      DATABRIDGE_MCP_ENABLED: 'true'
+      DATABRIDGE_MCP_ADMIN_KEY: ${DATABRIDGE_MCP_ADMIN_KEY:?Set separate database administrator key}
+      DATABRIDGE_MCP_ENDPOINTS: '{"dbhub":{"url":"http://dbhub:8080/mcp","backend":"dbhub","readonly":true},"toolbox":{"url":"http://toolbox-gateway:8080/mcp","backend":"toolbox","readonly":true},"duckdb":{"url":"http://duckdb-broker:8080/mcp","backend":"duckdb","readonly":true}}'
+      DATABRIDGE_DATA_ROOT: /app/data/databridge
+    volumes:
+      - dataset-staging:/app/data/databridge/staging
+      - dataset-versions:/app/data/databridge/published
+    networks: [mcp]
+  dbhub:
+    image: bytebase/dbhub:1.5.0@sha256:aa04093100a15911c7ee326e870fa11480e1466342e8433fdd67b45c9af52ccf
+    command: [--transport, http, --host, 0.0.0.0, --port, '8080', --config, /config/dbhub.toml]
+    environment:
+      DBHUB_AUTH_TOKEN: ${DATABRIDGE_DBHUB_TOKEN:?Set DBHub bearer token}
+      DBHUB_ALLOWED_HOSTS: dbhub
+    volumes:
+      - ${DATABRIDGE_DBHUB_CONFIG:?Set reviewed DBHub config path}:/config/dbhub.toml:ro
+    networks: [mcp]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    cpus: 1
+    mem_limit: 512m
+    restart: unless-stopped
+  toolbox:
+    image: us-central1-docker.pkg.dev/database-toolbox/toolbox/toolbox:1.15.0@sha256:7e4f7bfd93ccec33c066563a4ca700572e4ce95a8d45ba18577df8ee50b9481a
+    command: [--config, /config/tools.yaml, --address, 0.0.0.0, --disable-reload, --disable-version-check]
+    volumes:
+      - ${DATABRIDGE_TOOLBOX_CONFIG:?Set reviewed Toolbox config path}:/config/tools.yaml:ro
+    networks: [toolbox-private]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    cpus: 1
+    mem_limit: 256m
+    restart: unless-stopped
+  toolbox-gateway:
+    image: databridge-p2-duckdb:local
+    build:
+      context: .
+      dockerfile: deployment/databridge/mcp/Dockerfile.duckdb
+    command: [python, toolbox_proxy.py]
+    environment:
+      DATABRIDGE_TOOLBOX_TOKEN: ${DATABRIDGE_TOOLBOX_TOKEN:?Set Toolbox bearer token}
+    networks: [mcp, toolbox-private]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    cpus: 1
+    mem_limit: 256m
+    restart: unless-stopped
+  duckdb-broker:
+    image: databridge-p2-duckdb:local
+    build:
+      context: .
+      dockerfile: deployment/databridge/mcp/Dockerfile.duckdb
+    environment:
+      DATABRIDGE_DUCKDB_TOKEN: ${DATABRIDGE_DUCKDB_TOKEN:?Set DuckDB bearer token}
+    volumes: [dataset-versions:/datasets/published:ro]
+    networks: [mcp]
+    read_only: true
+    tmpfs: ['/tmp:size=128m,mode=1777']
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    cpus: 2
+    mem_limit: 1g
+    pids_limit: 96
+    restart: unless-stopped
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8080/health', timeout=5)"]
+      interval: 10s
+      timeout: 6s
+      retries: 15
+networks:
+  mcp: {internal: true}
+  toolbox-private: {internal: true}
+volumes:
+  dataset-staging:
+  dataset-versions:

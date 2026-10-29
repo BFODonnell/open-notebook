@@ -1,0 +1,218 @@
+{
+  "date": "2026-10-29",
+  "environment": "Docker Desktop Linux; source-built combined API/worker/frontend and pinned MCP services",
+  "base_commit": "02b821c",
+  "external_provider": "Synthetic OpenAI-compatible HTTP fixture; no live GPT-6 Astra call",
+  "actual_versions": {
+    "application_mcp": "1.28.1",
+    "esperanto": "2.28.0",
+    "sqlglot": "30.25.0",
+    "jsonschema": "4.26.0",
+    "duckdb": "1.5.6",
+    "dbhub": "1.5.0",
+    "toolbox": "1.15.0",
+    "isolated_motherduck": "1.1.0",
+    "isolated_mcp": "2.3.0",
+    "isolated_fastmcp": "4.1.4"
+  },
+  "phase2_application_acceptance": [
+    {
+      "mode": "seed",
+      "passed": 65,
+      "checks": [
+        "Application authentication required",
+        "Application password alone cannot administer database connections",
+        "Publication retry safely reconciles existing manifest/registry",
+        "Publication retry safely reconciles existing manifest/registry",
+        "Immutable content versions, stable schema identity",
+        "Publication rejects path traversal and version reassignment",
+        "dbhub real initialize/list_tools and explicit signature approval",
+        "dbhub real schema discovery",
+        "dbhub schema respects database/connection column scope",
+        "dbhub real MCP result",
+        "Canonical evidence hash",
+        "dbhub connection and evidence notebook scope enforced",
+        "dbhub token encrypted at rest",
+        "dbhub public registry excludes credential values",
+        "dbhub application row cap enforced before execution",
+        "dbhub writes, multi-statements, files, hidden columns/catalogs, functions, comments, CTEs and joins rejected",
+        "dbhub rejected SQL has hash-only audit records",
+        "toolbox real initialize/list_tools and explicit signature approval",
+        "toolbox real schema discovery",
+        "toolbox schema respects database/connection column scope",
+        "toolbox real MCP result",
+        "Canonical evidence hash",
+        "toolbox connection and evidence notebook scope enforced",
+        "toolbox token encrypted at rest",
+        "toolbox public registry excludes credential values",
+        "Toolbox rejects parameter injection and extra arguments",
+        "sample-wide bounded failure (byte cap or database timeout)",
+        "sample-slow bounded failure (byte cap or database timeout)",
+        "duckdb real initialize/list_tools and explicit signature approval",
+        "duckdb real schema discovery",
+        "duckdb schema respects database/connection column scope",
+        "duckdb real MCP result",
+        "Canonical evidence hash",
+        "duckdb connection and evidence notebook scope enforced",
+        "duckdb token encrypted at rest",
+        "duckdb public registry excludes credential values",
+        "duckdb application row cap enforced before execution",
+        "duckdb writes, multi-statements, files, hidden columns/catalogs, functions, comments, CTEs and joins rejected",
+        "duckdb rejected SQL has hash-only audit records",
+        "Concurrent approval is executed exactly once",
+        "Wrong, expired and replayed approvals cannot execute",
+        "Disabling, updating or reapproving invalidates pending execution",
+        "dbhub wrong credential fails without disclosure",
+        "dbhub real MCP result",
+        "Canonical evidence hash",
+        "toolbox wrong credential fails without disclosure",
+        "toolbox real MCP result",
+        "Canonical evidence hash",
+        "duckdb wrong credential fails without disclosure",
+        "duckdb real MCP result",
+        "Canonical evidence hash",
+        "dbhub independently authenticates MCP transport",
+        "toolbox-gateway independently authenticates MCP transport",
+        "duckdb-broker independently authenticates MCP transport",
+        "DBHub/database defense rejects DELETE",
+        "DBHub/database defense rejects SELECT",
+        "DBHub database statement timeout is active",
+        "DuckDB broker rejects external reads independently of application",
+        "Unknown immutable version is unavailable",
+        "duckdb-version-two real MCP result",
+        "Canonical evidence hash",
+        "duckdb real MCP result",
+        "Canonical evidence hash",
+        "Old and new immutable database selections coexist",
+        "Evidence binds each query to the exact published database hash"
+      ]
+    },
+    {
+      "mode": "outage",
+      "passed": 1,
+      "checks": [
+        "outage produces durable failure, no fabricated rows"
+      ]
+    },
+    {
+      "mode": "drift",
+      "passed": 1,
+      "checks": [
+        "drift produces durable failure, no fabricated rows"
+      ]
+    },
+    {
+      "mode": "restart",
+      "passed": 8,
+      "checks": [
+        "dbhub real MCP result",
+        "Canonical evidence hash",
+        "toolbox real MCP result",
+        "Canonical evidence hash",
+        "duckdb real MCP result",
+        "Canonical evidence hash",
+        "Evidence, version and hashes survive application/SurrealDB/broker restart",
+        "Immutable versions survive restart"
+      ]
+    }
+  ],
+  "native_motherduck": {
+    "passed": 6,
+    "checks": [
+      "isolated child receives no broker/application secrets or database switching tool",
+      "engine denial/timeout: CREATE TABLE forbidden(value INTEGER)",
+      "engine denial/timeout: SELECT * FROM read_csv('/etc/passwd')",
+      "engine denial/timeout: SET enable_external_access=true",
+      "engine denial/timeout: INSTALL httpfs",
+      "engine denial/timeout: SELECT SUM(random()) FROM range(1000000000000)"
+    ]
+  },
+  "postgres_expected_denials": {
+    "pg-write-denial.log": true,
+    "pg-grant-denial.log": true,
+    "pg-column-denial.log": true,
+    "pg-catalog-denial.log": true
+  },
+  "phase1_regression": [
+    {
+      "mode": "seed",
+      "passed": 17,
+      "checks": [
+        "usage retains upstream password authentication",
+        "application key cannot administer gateway keys",
+        "notebook question reaches real LiteLLM through Esperanto and LangGraph",
+        "all four provider-reported token categories persist",
+        "canonical proxy cost uses USD per-token units",
+        "request, notebook, session and task attribution persists",
+        "usage projection contains no keys, provider URL or prompts",
+        "UTC date filtering excludes outside-window records",
+        "provider failure returns a useful typed API error",
+        "failed provider call is attempted exactly once without SDK/router retries",
+        "failed provider attempt never fabricates free cost or usage",
+        "failed chat turn is removed from persistent checkpoint",
+        "limited key makes its first billable request",
+        "real persistent key budget denies subsequent requests",
+        "usage excludes requests made with another key",
+        "exhausted application budget produces an actionable chat error",
+        "usage remains readable when the application budget is exhausted"
+      ]
+    },
+    {
+      "mode": "restart",
+      "passed": 5,
+      "checks": [
+        "token/cost/attribution record survives PostgreSQL and LiteLLM restart",
+        "application spend is not reset by key provisioning",
+        "budget denial survives database and proxy restart",
+        "model bootstrap is idempotent after application restart",
+        "existing notebook and LangGraph conversation survive restart"
+      ]
+    },
+    {
+      "mode": "unpriced",
+      "passed": 4,
+      "checks": [
+        "environment change selects a new deployment default",
+        "changed default reaches provider without manual model setup",
+        "unknown model pricing remains unavailable while real usage persists",
+        "model change preserves historical attribution"
+      ]
+    }
+  ],
+  "suites": {
+    "backend": 1145,
+    "optional_mcp_cases": 128,
+    "base_backend": 1017,
+    "base_optional_module_skipped": 1,
+    "frontend": 193,
+    "frontend_files": 37,
+    "worker_smoke": 7,
+    "python_files_lint_format_mypy": 180,
+    "frontend_lint_errors": 0,
+    "frontend_existing_warnings": 7,
+    "production_build": "passed",
+    "settings_http": 200
+  },
+  "synthetic_persisted_evidence": {
+    "id": "db_query_run:txsf0w9bdmu1awppr7ay",
+    "connection_id": "db_connection:s85qz71xvcwq8c4gwro2",
+    "notebook_id": "notebook:wjvt2dyx5uuyeooypk2g",
+    "version_id": "6b20da1b-9423-4043-a74d-cfd92aacf896",
+    "dataset_sha256": "3b47b970605bdc57c9c9c46d9dce3a7dca2394e4dc05cd3bfac9dabe9231c5a9",
+    "sql": "SELECT SUM(\"value\") AS \"total\" FROM \"sample\" LIMIT 2",
+    "rows": [
+      {
+        "total": 6
+      }
+    ],
+    "result_sha256": "e444e427cc872744f9a02f79f058ce1cea7583d025f6ada57aa19e1d311d69f2",
+    "timestamp": "2026-10-29T17:55:30.226046+00:00"
+  },
+  "outstanding": [
+    "Live GPT-6 Astra validation",
+    "Browser E2E",
+    "Other DBHub engines including SQL Server multi-catalog certification",
+    "Human translations"
+  ],
+  "phase3_started": false
+}

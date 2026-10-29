@@ -1,0 +1,12 @@
+[[sources]]
+id = "synthetic"
+dsn = "postgres://dbhub_reader:p2-dbhub-db-only@fixture-pg:5432/analytics"
+query_timeout = 1
+[[tools]]
+name = "execute_sql"
+source = "synthetic"
+readonly = true
+max_rows = 1000
+[[tools]]
+name = "search_objects"
+source = "synthetic"

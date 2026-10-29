@@ -1,0 +1,17 @@
+REVOKE ALL ON DATABASE analytics FROM PUBLIC;
+REVOKE CREATE ON SCHEMA public FROM PUBLIC;
+CREATE ROLE dbhub_reader LOGIN PASSWORD 'p2-dbhub-db-only';
+CREATE ROLE toolbox_reader LOGIN PASSWORD 'p2-toolbox-db-only';
+ALTER ROLE dbhub_reader SET default_transaction_read_only = on;
+ALTER ROLE toolbox_reader SET default_transaction_read_only = on;
+ALTER ROLE dbhub_reader SET statement_timeout = '1000ms';
+ALTER ROLE toolbox_reader SET statement_timeout = '1000ms';
+ALTER ROLE dbhub_reader SET lock_timeout = '500ms';
+ALTER ROLE toolbox_reader SET lock_timeout = '500ms';
+GRANT CONNECT ON DATABASE analytics TO dbhub_reader, toolbox_reader;
+GRANT USAGE ON SCHEMA public TO dbhub_reader, toolbox_reader;
+CREATE TABLE sample(value integer PRIMARY KEY, label text, secret text);
+INSERT INTO sample VALUES (1,'one','restricted'),(2,'two','restricted'),(3,'three','restricted');
+GRANT SELECT(value,label) ON sample TO dbhub_reader, toolbox_reader;
+CREATE DATABASE hidden;
+REVOKE CONNECT ON DATABASE hidden FROM PUBLIC;
