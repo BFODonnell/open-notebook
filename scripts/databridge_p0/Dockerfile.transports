@@ -1,0 +1,5 @@
+# Trusted test harness only. The MCP servers never receive the Docker socket.
+FROM databridge-p0-proof:local
+COPY --from=docker:28.3.2-cli@sha256:a07d3db92e0ca51de11fd47c9b45257a7c3d64a5b6dae2393382a86a100f42a5 /usr/local/bin/docker /usr/local/bin/docker
+COPY scripts/databridge_p0/mcp_transports.py ./
+CMD ["uv", "run", "--frozen", "python", "mcp_transports.py"]

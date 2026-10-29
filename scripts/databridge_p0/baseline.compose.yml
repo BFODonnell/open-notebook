@@ -1,0 +1,57 @@
+# Isolated synthetic P0 source boot. No host ports, real keys or user data mounts.
+x-app: &app
+  image: databridge-p0-baseline:local
+  cpus: 1
+  mem_limit: 1536m
+  environment:
+    SURREAL_URL: ws://surrealdb:8000/rpc
+    SURREAL_USER: p0
+    SURREAL_PASSWORD: p0-local-only
+    SURREAL_NAMESPACE: p0
+    SURREAL_DATABASE: p0
+    OPEN_NOTEBOOK_ENCRYPTION_KEY: p0-throwaway-public-fixture
+  volumes:
+    - app-data:/app/data
+
+services:
+  surrealdb:
+    image: surrealdb/surrealdb:v2.6.4@sha256:0f36bc8972e172e4768db8e32507cd22c4db8f47cbcee0ae5753cc6db00b96b4
+    command: [start, --user, p0, --pass, p0-local-only, memory]
+    cpus: 1
+    mem_limit: 512m
+  api:
+    <<: *app
+    build:
+      context: ../..
+      dockerfile: scripts/databridge_p0/Dockerfile.baseline
+    depends_on: [surrealdb]
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5055/health', timeout=5)"]
+      interval: 3s
+      timeout: 6s
+      retries: 40
+  worker:
+    <<: *app
+    command: [surreal-commands-worker, --import-modules, commands, --max-tasks, '1']
+    depends_on:
+      api:
+        condition: service_healthy
+  frontend:
+    image: node:22-alpine@sha256:c610fcdfb1d5b4740dd70c284ed3cb16bb857e0f7166196e36a5501df7a3aa32
+    cpus: 1
+    mem_limit: 768m
+    network_mode: service:api
+    depends_on:
+      api:
+        condition: service_healthy
+    working_dir: /app
+    environment:
+      HOSTNAME: 0.0.0.0
+      PORT: '3000'
+    volumes:
+      - ../../frontend/.next:/build:ro
+      - ../../frontend/public:/public:ro
+    command: [sh, -c, 'cp -r /build/standalone/. /app/ && cp -r /build/static /app/.next/ && cp -r /public /app/public && node server.js']
+
+volumes:
+  app-data:

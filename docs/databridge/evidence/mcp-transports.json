@@ -1,0 +1,119 @@
+{
+  "fixture": "synthetic SQLite: 1, 2, 3",
+  "checks": [
+    "DBHub missing/invalid bearer rejected",
+    "DBHub missing/invalid bearer rejected",
+    "DBHub DELETE denied",
+    "DBHub row cap enforced",
+    "Toolbox exposes only curated SELECT; arbitrary SQL tool rejected"
+  ],
+  "official": [
+    {
+      "tools": [
+        "execute_sql",
+        "search_objects"
+      ],
+      "result": {
+        "meta": null,
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"success\": true,\n  \"data\": {\n    \"statements\": [\n      {\n        \"sql\": \"SELECT SUM(value) AS total FROM sample\",\n        \"rows\": [\n          {\n            \"total\": 6\n          }\n        ],\n        \"count\": 1\n      }\n    ],\n    \"source_id\": \"fixture\"\n  }\n}",
+            "annotations": null,
+            "meta": null
+          }
+        ],
+        "structuredContent": null,
+        "isError": false
+      }
+    },
+    {
+      "tools": [
+        "execute_sql",
+        "search_objects"
+      ],
+      "result": {
+        "meta": null,
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"success\": true,\n  \"data\": {\n    \"statements\": [\n      {\n        \"sql\": \"SELECT SUM(value) AS total FROM sample\",\n        \"rows\": [\n          {\n            \"total\": 6\n          }\n        ],\n        \"count\": 1\n      }\n    ],\n    \"source_id\": \"fixture\"\n  }\n}",
+            "annotations": null,
+            "meta": null
+          }
+        ],
+        "structuredContent": null,
+        "isError": false
+      }
+    }
+  ],
+  "fastmcp": [
+    {
+      "tools": [
+        "execute_sql",
+        "search_objects"
+      ],
+      "result": [
+        {
+          "type": "text",
+          "text": "{\n  \"success\": true,\n  \"data\": {\n    \"statements\": [\n      {\n        \"sql\": \"SELECT SUM(value) AS total FROM sample\",\n        \"rows\": [\n          {\n            \"total\": 6\n          }\n        ],\n        \"count\": 1\n      }\n    ],\n    \"source_id\": \"fixture\"\n  }\n}",
+          "annotations": null,
+          "meta": null
+        }
+      ]
+    },
+    {
+      "tools": [
+        "execute_sql",
+        "search_objects"
+      ],
+      "result": [
+        {
+          "type": "text",
+          "text": "{\n  \"success\": true,\n  \"data\": {\n    \"statements\": [\n      {\n        \"sql\": \"SELECT SUM(value) AS total FROM sample\",\n        \"rows\": [\n          {\n            \"total\": 6\n          }\n        ],\n        \"count\": 1\n      }\n    ],\n    \"source_id\": \"fixture\"\n  }\n}",
+          "annotations": null,
+          "meta": null
+        }
+      ]
+    }
+  ],
+  "denied_write": {
+    "meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\n  \"success\": false,\n  \"error\": \"Read-only mode is enabled. Only the following SQL operations are allowed: select, with, explain, pragma\",\n  \"code\": \"READONLY_VIOLATION\"\n}",
+        "annotations": null,
+        "meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": true
+  },
+  "capped": {
+    "meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\n  \"success\": true,\n  \"data\": {\n    \"statements\": [\n      {\n        \"sql\": \"SELECT value FROM sample ORDER BY value\",\n        \"rows\": [\n          {\n            \"value\": 1\n          },\n          {\n            \"value\": 2\n          }\n        ],\n        \"count\": 2,\n        \"truncated\": true\n      }\n    ],\n    \"source_id\": \"fixture\"\n  }\n}",
+        "annotations": null,
+        "meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  },
+  "toolbox": {
+    "meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"total\":6}",
+        "annotations": null,
+        "meta": null
+      }
+    ],
+    "structuredContent": null,
+    "isError": false
+  }
+}
