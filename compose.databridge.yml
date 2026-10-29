@@ -79,6 +79,8 @@ services:
     ports: ['127.0.0.1:${DATABRIDGE_UI_PORT:-8502}:8502', '127.0.0.1:${DATABRIDGE_API_PORT:-5055}:5055']
     environment:
       DATABRIDGE_ENABLED: 'true'
+      # Browser-visible port can differ from the API's internal container port.
+      API_URL: ${API_URL:-http://localhost:${DATABRIDGE_API_PORT:-5055}}
       LITELLM_PROXY_URL: http://litellm:4000
       LITELLM_APP_VIRTUAL_KEY: ${LITELLM_APP_VIRTUAL_KEY:?Set app key}
       LLM_MODEL: ${LLM_MODEL:-gpt-6-astra}

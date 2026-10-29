@@ -29,6 +29,17 @@ uv run --no-sync python scripts/databridge_live/run.py up
 Live-Test restart
 ```
 
+Also verify the host/browser route, which container-local API tests do not cover:
+
+```powershell
+$runtime = Invoke-RestMethod 'http://localhost:18503/config'
+if ($runtime.apiUrl -ne 'http://localhost:15056') { throw 'Browser API port mismatch' }
+$response = Invoke-WebRequest -UseBasicParsing ($runtime.apiUrl + '/api/config') -Headers @{Origin='http://localhost:18503'}
+if ($response.StatusCode -ne 200 -or $response.Headers['Access-Control-Allow-Origin'] -ne 'http://localhost:18503') { throw 'Browser API connection failed' }
+```
+
+These HTTP checks complement, but do not replace, browser end-to-end testing.
+
 The search targets **2022 - 2025 NTD Annual Data - Service (by Mode and Time
 Period)**. All acquisition/import/query actions use application API endpoints.
 There is no direct file download, CLI ingestion, manual staging or external DB

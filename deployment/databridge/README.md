@@ -29,6 +29,12 @@ on loopback port 5055. Override `DATABRIDGE_UI_PORT` / `DATABRIDGE_API_PORT` if
 occupied. No database or gateway ports are published. Do not publish this
 development password-based service to the Internet.
 
+The frontend's runtime `API_URL` defaults to `http://localhost:` followed by
+`DATABRIDGE_API_PORT`, so custom host port mappings also work in the browser.
+Set `API_URL` explicitly for an operator-reviewed reverse proxy/public address.
+Internal server-side API traffic retains container port 5055. Recreate with `up`
+after changing these values; refresh the browser to reload `/config`.
+
 The upstream image runs the API, real worker and frontend under supervisord.
 The initializer provisions a restricted virtual key before API startup. Startup
 runs normal migrations, encrypts the linked gateway credential and registers the

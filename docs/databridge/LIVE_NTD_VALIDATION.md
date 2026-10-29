@@ -80,3 +80,18 @@ inspection; independent random local credentials are in the ignored
 original protected configuration and backend runtime. Other user containers and
 the untracked design package were untouched. Browser E2E, live GPT-6 Astra and
 remaining database certification are still outstanding.
+
+## Browser connection correction
+
+The owner subsequently found the UI's API connection error. Container-local API
+acceptance had missed that `/config` advertised the default host port 5055 while
+the live stack published the API on 15056. Compose now supplies runtime `API_URL`
+from `DATABRIDGE_API_PORT`, preserving an explicit `API_URL` override. The existing
+application image needed only recreation; no dataset volumes were reset.
+
+Verified after the correction: `/config` advertises `http://localhost:15056`;
+host-side `/api/config` returns HTTP 200 with database online; the UI origin is
+allowed by CORS; authorization/content-type preflight returns 200. Compose checks
+cover default port, custom port and explicit URL override. All 18 existing frontend
+configuration tests pass. The imported version and MCP year-count/hash checks also
+pass after recreation. These protocol checks are not full browser E2E certification.
