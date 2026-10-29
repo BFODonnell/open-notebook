@@ -48,6 +48,11 @@ dependencies = [
     "babel>=2.18.0",
 ]
 
+[project.optional-dependencies]
+databridge = [
+    "mcp==1.28.1",
+]
+
 [tool.setuptools]
 package-dir = {"open_notebook" = "open_notebook"}
 

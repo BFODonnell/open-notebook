@@ -1,0 +1,114 @@
+# Opt-in deployment; keep the upstream docker-compose.yml unchanged.
+name: open-notebook-databridge
+services:
+  surrealdb:
+    image: surrealdb/surrealdb:v2.6.4@sha256:0f36bc8972e172e4768db8e32507cd22c4db8f47cbcee0ae5753cc6db00b96b4
+    command: [start, --user, databridge, --pass, '${SURREAL_PASSWORD:?Set SURREAL_PASSWORD}', 'rocksdb:/mydata/database.db']
+    user: root
+    volumes: [surreal-data:/mydata]
+    networks: [database]
+    restart: unless-stopped
+    healthcheck:
+      test: [CMD, /surreal, is-ready, --endpoint, 'http://localhost:8000']
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    mem_limit: 1g
+  litellm-db:
+    image: postgres:17-alpine@sha256:742f40ea20b9ff2ff31db5458d127452988a2164df9e17441e191f3b72252193
+    environment:
+      POSTGRES_DB: litellm
+      POSTGRES_USER: litellm
+      POSTGRES_PASSWORD: ${LITELLM_POSTGRES_PASSWORD:?Set LITELLM_POSTGRES_PASSWORD}
+    volumes: [litellm-data:/var/lib/postgresql/data]
+    networks: [gateway-db]
+    restart: unless-stopped
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U litellm -d litellm]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    mem_limit: 768m
+  litellm:
+    image: ghcr.io/berriai/litellm:v1.106.6@sha256:37e2dafb088a7723beb998590682957386dfc83ffea1848486f8e0e5cfac0b06
+    entrypoint: [python, /opt/databridge/gateway.py]
+    environment:
+      DATABASE_URL: postgresql://litellm:${LITELLM_POSTGRES_PASSWORD:?Set password}@litellm-db:5432/litellm
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:?Set LITELLM_MASTER_KEY}
+      LITELLM_SALT_KEY: ${LITELLM_SALT_KEY:?Set stable LITELLM_SALT_KEY}
+      LLM_MODEL: ${LLM_MODEL:-gpt-6-astra}
+      LLM_PROVIDER_MODEL: ${LLM_PROVIDER_MODEL:-openai/gpt-6-astra}
+      OPENAI_API_BASE: ${OPENAI_API_BASE:-https://api.openai.com/v1}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:?Set provider API key}
+      LLM_INPUT_COST_PER_TOKEN: ${LLM_INPUT_COST_PER_TOKEN:-}
+      LLM_OUTPUT_COST_PER_TOKEN: ${LLM_OUTPUT_COST_PER_TOKEN:-}
+      STORE_MODEL_IN_DB: 'False'
+      LITELLM_LOG: ERROR
+      LITELLM_LOCAL_MODEL_COST_MAP: 'True'
+    volumes: [./deployment/databridge/gateway.py:/opt/databridge/gateway.py:ro]
+    networks: [gateway, gateway-db, egress]
+    depends_on:
+      litellm-db: {condition: service_healthy}
+    restart: unless-stopped
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:4000/health/readiness', timeout=5)"]
+      interval: 5s
+      timeout: 6s
+      retries: 60
+    mem_limit: 2g
+    cpus: 2
+  gateway-init:
+    image: ghcr.io/astral-sh/uv:0.8.3-python3.12-bookworm-slim@sha256:74b8fe8ec5931f3930cfb6c87b46aeb1dbd497a609f6abf860fd0f4390f8b040
+    command: [python, /opt/databridge/provision_key.py]
+    environment:
+      LITELLM_PROXY_URL: http://litellm:4000
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:?Set master key}
+      LITELLM_APP_VIRTUAL_KEY: ${LITELLM_APP_VIRTUAL_KEY:?Set separate app key}
+      LITELLM_APP_MAX_BUDGET: ${LITELLM_APP_MAX_BUDGET:-20}
+      LLM_MODEL: ${LLM_MODEL:-gpt-6-astra}
+    volumes: [./deployment/databridge/provision_key.py:/opt/databridge/provision_key.py:ro]
+    networks: [gateway]
+    depends_on:
+      litellm: {condition: service_healthy}
+    mem_limit: 128m
+  open-notebook:
+    build:
+      context: .
+      args: {UV_EXTRA: databridge}
+    image: open-notebook-databridge:local
+    ports: ['127.0.0.1:${DATABRIDGE_UI_PORT:-8502}:8502', '127.0.0.1:${DATABRIDGE_API_PORT:-5055}:5055']
+    environment:
+      DATABRIDGE_ENABLED: 'true'
+      LITELLM_PROXY_URL: http://litellm:4000
+      LITELLM_APP_VIRTUAL_KEY: ${LITELLM_APP_VIRTUAL_KEY:?Set app key}
+      LLM_MODEL: ${LLM_MODEL:-gpt-6-astra}
+      SURREAL_URL: ws://surrealdb:8000/rpc
+      SURREAL_USER: databridge
+      SURREAL_PASSWORD: ${SURREAL_PASSWORD:?Set SurrealDB password}
+      SURREAL_NAMESPACE: open_notebook
+      SURREAL_DATABASE: open_notebook
+      OPEN_NOTEBOOK_ENCRYPTION_KEY: ${OPEN_NOTEBOOK_ENCRYPTION_KEY:?Set encryption key}
+      OPEN_NOTEBOOK_PASSWORD: ${OPEN_NOTEBOOK_PASSWORD:?Set application password}
+      CORS_ORIGINS: http://localhost:${DATABRIDGE_UI_PORT:-8502},http://127.0.0.1:${DATABRIDGE_UI_PORT:-8502}
+    volumes: [notebook-data:/app/data]
+    networks: [database, gateway, egress]
+    depends_on:
+      surrealdb: {condition: service_healthy}
+      gateway-init: {condition: service_completed_successfully}
+    restart: unless-stopped
+    healthcheck:
+      test: [CMD, curl, --fail, --silent, 'http://localhost:5055/health']
+      interval: 10s
+      timeout: 5s
+      retries: 30
+    mem_limit: 3g
+    cpus: 2
+networks:
+  database: {internal: true}
+  gateway-db: {internal: true}
+  gateway: {internal: true}
+  egress: {}
+volumes:
+  surreal-data:
+  litellm-data:
+  notebook-data:

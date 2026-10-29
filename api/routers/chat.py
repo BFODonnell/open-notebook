@@ -355,18 +355,24 @@ async def execute_chat(request: ExecuteChatRequest):
         # get_state() calls above.
         # invoke_chat_turn also drops the question from the checkpoint when the
         # turn fails, so a retry doesn't add it twice.
-        result = await asyncio.to_thread(
-            invoke_chat_turn,
-            chat_graph,
-            state_values,
-            RunnableConfig(
-                configurable={
-                    "thread_id": full_session_id,
-                    "model_id": model_override,
-                }
-            ),
-            user_message,
-        )
+        from open_notebook.databridge.correlation import usage_context
+
+        with usage_context(
+            session_id=full_session_id,
+            notebook_id=str(notebook.id) if notebook else "",
+        ):
+            result = await asyncio.to_thread(
+                invoke_chat_turn,
+                chat_graph,
+                state_values,
+                RunnableConfig(
+                    configurable={
+                        "thread_id": full_session_id,
+                        "model_id": model_override,
+                    }
+                ),
+                user_message,
+            )
 
         # Update session timestamp
         await session.save()

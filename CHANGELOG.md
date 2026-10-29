@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Opt-in DataBridge deployment with a persistent LiteLLM/PostgreSQL gateway, environment-managed Esperanto chat defaults, scoped usage accounting and a Settings usage panel. Includes budget enforcement, explicit unavailable pricing, and isolated acceptance fixtures; existing direct providers remain available and are outside gateway metering.
 - DataBridge Phase 0 upstream audit, dependency compatibility findings, and isolated DuckDB/MCP concurrency and transport experiments. These developer tools do not enable DataBridge application features.
 
 ### Changed

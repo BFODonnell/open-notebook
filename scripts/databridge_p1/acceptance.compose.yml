@@ -1,0 +1,32 @@
+# Layer onto compose.databridge.yml; only synthetic disposable data.
+services:
+  fixture:
+    image: databridge-p0-baseline:local
+    working_dir: /workspace
+    command: [/app/.venv/bin/uvicorn, scripts.databridge_p1.fixture:app, --host, 0.0.0.0, --port, '8080']
+    volumes: [.:/workspace:ro]
+    networks: [egress]
+    mem_limit: 512m
+  open-notebook:
+    image: databridge-p0-baseline:local
+    working_dir: /workspace
+    command: [/app/.venv/bin/uvicorn, api.main:app, --host, 0.0.0.0, --port, '5055']
+    volumes: [.:/workspace:ro, notebook-data:/workspace/data]
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:5055/health', timeout=5)"]
+  worker:
+    image: databridge-p0-baseline:local
+    working_dir: /workspace
+    command: [/app/.venv/bin/surreal-commands-worker, --import-modules, commands, --max-tasks, '1']
+    environment:
+      SURREAL_URL: ws://surrealdb:8000/rpc
+      SURREAL_USER: databridge
+      SURREAL_PASSWORD: p1-fixture-only
+      SURREAL_NAMESPACE: open_notebook
+      SURREAL_DATABASE: open_notebook
+      OPEN_NOTEBOOK_ENCRYPTION_KEY: p1-fixture-encryption-only
+    volumes: [.:/workspace:ro, notebook-data:/workspace/data]
+    networks: [database, gateway, egress]
+    depends_on:
+      open-notebook: {condition: service_healthy}
+    mem_limit: 768m

@@ -52,7 +52,8 @@ COPY pyproject.toml uv.lock ./
 COPY open_notebook/__init__.py ./open_notebook/__init__.py
 
 # Install dependencies (this layer is cached unless dependencies change)
-RUN uv sync --frozen --no-dev
+ARG UV_EXTRA=
+RUN if [ -n "$UV_EXTRA" ]; then uv sync --frozen --no-dev --extra "$UV_EXTRA"; else uv sync --frozen --no-dev; fi
 
 # Pre-download tiktoken encoding so the app works offline (issue #264).
 # /app/tiktoken-cache is intentionally outside /app/data/ so that volume mounts

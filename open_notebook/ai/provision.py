@@ -3,6 +3,7 @@ from langchain_core.language_models.chat_models import BaseChatModel
 from loguru import logger
 
 from open_notebook.ai.models import model_manager
+from open_notebook.databridge.correlation import attach_usage
 from open_notebook.exceptions import ConfigurationError
 from open_notebook.utils import token_count
 
@@ -58,4 +59,4 @@ async def provision_langchain_model(
             f"Please check that the model configured for '{default_type}' is a language model, not an embedding or speech model."
         )
 
-    return model.to_langchain()
+    return attach_usage(model.to_langchain(), default_type)

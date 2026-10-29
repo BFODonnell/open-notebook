@@ -1,6 +1,34 @@
 import type { TranslationShape } from '../en-US';
 
 export const ptBR = {
+  databridge: {
+    "title": "DataBridge model usage",
+    "coverage": "Gateway language calls only. Other providers, embeddings, speech and tools are not included.",
+    "unavailable": "Cost unavailable",
+    "loading": "Loading gateway usage…",
+    "error": "Gateway usage is unavailable. Check the gateway and its database, then refresh.",
+    "period": "Period (UTC)",
+    "today": "Today",
+    "week": "Last 7 days",
+    "all": "All time",
+    "refresh": "Refresh",
+    "managed": "Chat default managed by .env",
+    "budget": "Lifetime estimated budget remaining / limit",
+    "exhausted": "Gateway budget exhausted. Contact the deployment operator.",
+    "estimate": "Estimates are not invoices. Unpriced usage is not covered by the cost budget. Logging and budget updates may be delayed; concurrent requests can exceed the cap. Missing token details are shown as —.",
+    "empty": "No gateway requests in this period yet.",
+    "request": "Request",
+    "tokens": "Input / output tokens",
+    "cost": "Estimated cost",
+    "success": "Succeeded",
+    "failed": "Failed or unavailable",
+    "details": "Attribution",
+    "cached": "Cached input",
+    "reasoning": "Reasoning",
+    "previous": "Previous",
+    "next": "Next",
+    "capped": "The gateway capped this result count. Select a shorter period."
+},
   common: {
     search: "Buscar...",
     create: "Novo",

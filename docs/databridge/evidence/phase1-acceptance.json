@@ -1,0 +1,99 @@
+{
+  "date": "2026-10-29",
+  "environment": "Docker Desktop Linux; full source-built Open Notebook combined API/worker/frontend image",
+  "external_provider": "Deterministic isolated OpenAI-compatible HTTP fixture; no paid requests",
+  "real_services": [
+    "Esperanto 2.28.0",
+    "LangGraph",
+    "SurrealDB 2.6.4",
+    "LiteLLM 1.106.6",
+    "PostgreSQL 17"
+  ],
+  "application_mcp_sdk": "1.28.1",
+  "locked_dependency_version_changes": [],
+  "acceptance": [
+    {
+      "mode": "seed",
+      "passed": 17,
+      "checks": [
+        "usage retains upstream password authentication",
+        "application key cannot administer gateway keys",
+        "notebook question reaches real LiteLLM through Esperanto and LangGraph",
+        "all four provider-reported token categories persist",
+        "canonical proxy cost uses USD per-token units",
+        "request, notebook, session and task attribution persists",
+        "usage projection contains no keys, provider URL or prompts",
+        "UTC date filtering excludes outside-window records",
+        "provider failure returns a useful typed API error",
+        "failed provider call is attempted exactly once without SDK/router retries",
+        "failed provider attempt never fabricates free cost or usage",
+        "failed chat turn is removed from persistent checkpoint",
+        "limited key makes its first billable request",
+        "real persistent key budget denies subsequent requests",
+        "usage excludes requests made with another key",
+        "exhausted application budget produces an actionable chat error",
+        "usage remains readable when the application budget is exhausted"
+      ]
+    },
+    {
+      "mode": "restart",
+      "passed": 5,
+      "checks": [
+        "token/cost/attribution record survives PostgreSQL and LiteLLM restart",
+        "application spend is not reset by key provisioning",
+        "budget denial survives database and proxy restart",
+        "model bootstrap is idempotent after application restart",
+        "existing notebook and LangGraph conversation survive restart"
+      ]
+    },
+    {
+      "mode": "unpriced",
+      "passed": 4,
+      "checks": [
+        "environment change selects a new deployment default",
+        "changed default reaches provider without manual model setup",
+        "unknown model pricing remains unavailable while real usage persists",
+        "model change preserves historical attribution"
+      ]
+    }
+  ],
+  "acceptance_passed": 26,
+  "upstream_worker_smoke": {
+    "passed": 7,
+    "checks": [
+      "API health",
+      "existing provider registry reachable",
+      "notebook create/read/update",
+      "text source submitted and processed by real worker",
+      "uploaded document processed and original download preserved",
+      "source context and existing chat session CRUD",
+      "synthetic notebook/source cleanup"
+    ],
+    "unrun": "Live LLM/embeddings/podcast calls require provider configuration"
+  },
+  "regressions": {
+    "backend_passed": 1017,
+    "backend_warnings": 2,
+    "frontend_passed": 187,
+    "frontend_files": 36,
+    "frontend_lint_errors": 0,
+    "frontend_lint_existing_warnings": 7,
+    "frontend_build": "passed",
+    "source_image_build": "passed",
+    "python_ruff_format_mypy_files_passed": 168
+  },
+  "additional_checks": {
+    "frontend_home_http": 200,
+    "frontend_settings_http": 200,
+    "master_key_in_app_logs": false,
+    "master_key_in_proxy_logs": false,
+    "master_key_in_frontend_static_bundle": false,
+    "admin_provider_postgres_secrets_in_app_environment": false
+  },
+  "unverified": [
+    "Live provider account access and billing",
+    "Browser visual/interaction inspection: browser access host unavailable",
+    "Streaming/provider embeddings/podcasts",
+    "Phase 2 MCP adapters"
+  ]
+}

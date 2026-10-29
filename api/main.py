@@ -28,6 +28,7 @@ from api.routers import (
     chat,
     config,
     credentials,
+    databridge,
     embedding,
     embedding_rebuild,
     episode_profiles,
@@ -207,6 +208,9 @@ async def lifespan(app: FastAPI):
         # Fail fast - don't start the API with an outdated database schema
         raise RuntimeError(f"Failed to run database migrations: {str(e)}") from e
 
+    from open_notebook.databridge.bootstrap import bootstrap_gateway
+
+    await bootstrap_gateway()
     logger.success("API initialization completed successfully")
 
     # Yield control to the application
@@ -381,6 +385,7 @@ async def open_notebook_error_handler(request: Request, exc: OpenNotebookError):
 
 # Include routers
 app.include_router(auth.router, prefix="/api", tags=["auth"])
+app.include_router(databridge.router, prefix="/api", tags=["databridge"])
 app.include_router(config.router, prefix="/api", tags=["config"])
 app.include_router(notebooks.router, prefix="/api", tags=["notebooks"])
 app.include_router(search.router, prefix="/api", tags=["search"])

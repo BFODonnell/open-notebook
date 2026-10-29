@@ -15,7 +15,9 @@ async def main() -> None:
     checks: list[str] = []
     notebook_id = None
     source_ids: list[str] = []
-    async with httpx.AsyncClient(base_url=base, timeout=20) as client:
+    password = os.getenv("P0_API_PASSWORD")
+    headers = {"Authorization": f"Bearer {password}"} if password else {}
+    async with httpx.AsyncClient(base_url=base, timeout=20, headers=headers) as client:
 
         async def request(method: str, path: str, **kwargs):
             response = await client.request(method, path, **kwargs)
