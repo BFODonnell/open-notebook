@@ -1,0 +1,485 @@
+{
+  "date": "2026-10-29",
+  "scope": "Owner-authorized synthetic Data.gov/publisher and LLM fixtures; real application, worker, databases, TLS transfers, publication and official MCP protocol",
+  "acceptance": {
+    "seed": {
+      "mode": "seed",
+      "passed": 51,
+      "checks": [
+        "Explorer retains upstream application authentication",
+        "Official v4-shaped search and agency/topic filters",
+        "Cursor pagination uses after rather than page offsets",
+        "Dataset metadata keeps publisher and report period",
+        "Unsupported Excel resource is explicitly classified",
+        "Unsafe publisher target is not importable",
+        "HTML masquerade rejected by real download preflight",
+        "Blocked redirect rejected by real download preflight",
+        "Oversize transfer rejected by real download preflight",
+        "Catalog rate limit is visible without leaking API credentials",
+        "CSV real HTTPS transfer and isolated parser preview",
+        "CSV preserves leading-zero agency identifiers",
+        "CSV import request is idempotent",
+        "CSV executed by the real background worker",
+        "CSV provenance binds downloaded bytes to immutable publication",
+        "CSV observable durable processing stages",
+        "Imported dataset returns exact synthetic total through real MCP",
+        "CSV imported provenance is notebook scoped",
+        "CSV automatically attaches documentation without embedding raw rows",
+        "JSON real HTTPS transfer and isolated parser preview",
+        "JSON preserves leading-zero agency identifiers",
+        "JSON import request is idempotent",
+        "JSON executed by the real background worker",
+        "JSON provenance binds downloaded bytes to immutable publication",
+        "JSON observable durable processing stages",
+        "Imported dataset returns exact synthetic total through real MCP",
+        "JSON imported provenance is notebook scoped",
+        "JSON automatically attaches documentation without embedding raw rows",
+        "PARQUET real HTTPS transfer and isolated parser preview",
+        "PARQUET preserves leading-zero agency identifiers",
+        "PARQUET import request is idempotent",
+        "PARQUET executed by the real background worker",
+        "PARQUET provenance binds downloaded bytes to immutable publication",
+        "PARQUET observable durable processing stages",
+        "Imported dataset returns exact synthetic total through real MCP",
+        "PARQUET imported provenance is notebook scoped",
+        "PARQUET automatically attaches documentation without embedding raw rows",
+        "ZIP real HTTPS transfer and isolated parser preview",
+        "ZIP preserves leading-zero agency identifiers",
+        "ZIP import request is idempotent",
+        "ZIP executed by the real background worker",
+        "ZIP provenance binds downloaded bytes to immutable publication",
+        "ZIP observable durable processing stages",
+        "Imported dataset returns exact synthetic total through real MCP",
+        "ZIP imported provenance is notebook scoped",
+        "ZIP automatically attaches documentation without embedding raw rows",
+        "Research-agent interface exposes active notebook versions and the DB-DATA-02 boundary",
+        "Other notebook sees no imported database records",
+        "Interrupted registration reconciles the same immutable version",
+        "Data.gov API key never reaches publisher requests",
+        "No raw/staging files remain after successful imports"
+      ]
+    },
+    "changed": {
+      "mode": "changed",
+      "passed": 2,
+      "checks": [
+        "Source mutation after preview fails before publication",
+        "Changed source never becomes an immutable published dataset"
+      ]
+    },
+    "cancel": {
+      "mode": "cancel",
+      "passed": 1,
+      "checks": [
+        "Running download cancellation stops before publication"
+      ]
+    },
+    "outage": {
+      "mode": "outage",
+      "passed": 1,
+      "checks": [
+        "Broker outage retains publication but never marks import ready"
+      ]
+    },
+    "outage-recover": {
+      "mode": "outage-recover",
+      "passed": 2,
+      "checks": [
+        "Restored broker reconciles the existing immutable version",
+        "Registration retry does not redownload source bytes"
+      ]
+    },
+    "interrupt-start": {
+      "mode": "interrupt-start",
+      "passed": 1,
+      "checks": [
+        "Real worker is downloading when interruption is requested"
+      ]
+    },
+    "interrupt-recover": {
+      "mode": "interrupt-recover",
+      "passed": 2,
+      "checks": [
+        "SIGKILL preserves durable interrupted-worker state across restart",
+        "Expired interrupted job resumes through the real worker with the same version identity"
+      ]
+    },
+    "revocation": {
+      "mode": "revocation",
+      "passed": 2,
+      "checks": [
+        "Recovery cannot override administrator connection revocation",
+        "Revoked connection remains disabled after recovery attempt"
+      ]
+    },
+    "restart": {
+      "mode": "restart",
+      "passed": 9,
+      "checks": [
+        "Version and provenance survive application/worker/database restart",
+        "Imported dataset returns exact synthetic total through real MCP",
+        "Version and provenance survive application/worker/database restart",
+        "Imported dataset returns exact synthetic total through real MCP",
+        "Version and provenance survive application/worker/database restart",
+        "Imported dataset returns exact synthetic total through real MCP",
+        "Version and provenance survive application/worker/database restart",
+        "Imported dataset returns exact synthetic total through real MCP",
+        "Notebook dataset discovery persists without claiming conversational analysis"
+      ]
+    },
+    "p2-seed": {
+      "mode": "seed",
+      "passed": 65,
+      "checks": [
+        "Application authentication required",
+        "Application password alone cannot administer database connections",
+        "Publication retry safely reconciles existing manifest/registry",
+        "Publication retry safely reconciles existing manifest/registry",
+        "Immutable content versions, stable schema identity",
+        "Publication rejects path traversal and version reassignment",
+        "dbhub real initialize/list_tools and explicit signature approval",
+        "dbhub real schema discovery",
+        "dbhub schema respects database/connection column scope",
+        "dbhub real MCP result",
+        "Canonical evidence hash",
+        "dbhub connection and evidence notebook scope enforced",
+        "dbhub token encrypted at rest",
+        "dbhub public registry excludes credential values",
+        "dbhub application row cap enforced before execution",
+        "dbhub writes, multi-statements, files, hidden columns/catalogs, functions, comments, CTEs and joins rejected",
+        "dbhub rejected SQL has hash-only audit records",
+        "toolbox real initialize/list_tools and explicit signature approval",
+        "toolbox real schema discovery",
+        "toolbox schema respects database/connection column scope",
+        "toolbox real MCP result",
+        "Canonical evidence hash",
+        "toolbox connection and evidence notebook scope enforced",
+        "toolbox token encrypted at rest",
+        "toolbox public registry excludes credential values",
+        "Toolbox rejects parameter injection and extra arguments",
+        "sample-wide bounded failure (byte cap or database timeout)",
+        "sample-slow bounded failure (byte cap or database timeout)",
+        "duckdb real initialize/list_tools and explicit signature approval",
+        "duckdb real schema discovery",
+        "duckdb schema respects database/connection column scope",
+        "duckdb real MCP result",
+        "Canonical evidence hash",
+        "duckdb connection and evidence notebook scope enforced",
+        "duckdb token encrypted at rest",
+        "duckdb public registry excludes credential values",
+        "duckdb application row cap enforced before execution",
+        "duckdb writes, multi-statements, files, hidden columns/catalogs, functions, comments, CTEs and joins rejected",
+        "duckdb rejected SQL has hash-only audit records",
+        "Concurrent approval is executed exactly once",
+        "Wrong, expired and replayed approvals cannot execute",
+        "Disabling, updating or reapproving invalidates pending execution",
+        "dbhub wrong credential fails without disclosure",
+        "dbhub real MCP result",
+        "Canonical evidence hash",
+        "toolbox wrong credential fails without disclosure",
+        "toolbox real MCP result",
+        "Canonical evidence hash",
+        "duckdb wrong credential fails without disclosure",
+        "duckdb real MCP result",
+        "Canonical evidence hash",
+        "dbhub independently authenticates MCP transport",
+        "toolbox-gateway independently authenticates MCP transport",
+        "duckdb-broker independently authenticates MCP transport",
+        "DBHub/database defense rejects DELETE",
+        "DBHub/database defense rejects SELECT",
+        "DBHub database statement timeout is active",
+        "DuckDB broker rejects external reads independently of application",
+        "Unknown immutable version is unavailable",
+        "duckdb-version-two real MCP result",
+        "Canonical evidence hash",
+        "duckdb real MCP result",
+        "Canonical evidence hash",
+        "Old and new immutable database selections coexist",
+        "Evidence binds each query to the exact published database hash"
+      ]
+    },
+    "p2-outage": {
+      "mode": "outage",
+      "passed": 1,
+      "checks": [
+        "outage produces durable failure, no fabricated rows"
+      ]
+    },
+    "p2-drift": {
+      "mode": "drift",
+      "passed": 1,
+      "checks": [
+        "drift produces durable failure, no fabricated rows"
+      ]
+    },
+    "p2-restart": {
+      "mode": "restart",
+      "passed": 8,
+      "checks": [
+        "dbhub real MCP result",
+        "Canonical evidence hash",
+        "toolbox real MCP result",
+        "Canonical evidence hash",
+        "duckdb real MCP result",
+        "Canonical evidence hash",
+        "Evidence, version and hashes survive application/SurrealDB/broker restart",
+        "Immutable versions survive restart"
+      ]
+    },
+    "p1-seed": {
+      "mode": "seed",
+      "passed": 17,
+      "checks": [
+        "usage retains upstream password authentication",
+        "application key cannot administer gateway keys",
+        "notebook question reaches real LiteLLM through Esperanto and LangGraph",
+        "all four provider-reported token categories persist",
+        "canonical proxy cost uses USD per-token units",
+        "request, notebook, session and task attribution persists",
+        "usage projection contains no keys, provider URL or prompts",
+        "UTC date filtering excludes outside-window records",
+        "provider failure returns a useful typed API error",
+        "failed provider call is attempted exactly once without SDK/router retries",
+        "failed provider attempt never fabricates free cost or usage",
+        "failed chat turn is removed from persistent checkpoint",
+        "limited key makes its first billable request",
+        "real persistent key budget denies subsequent requests",
+        "usage excludes requests made with another key",
+        "exhausted application budget produces an actionable chat error",
+        "usage remains readable when the application budget is exhausted"
+      ]
+    },
+    "p1-restart": {
+      "mode": "restart",
+      "passed": 5,
+      "checks": [
+        "token/cost/attribution record survives PostgreSQL and LiteLLM restart",
+        "application spend is not reset by key provisioning",
+        "budget denial survives database and proxy restart",
+        "model bootstrap is idempotent after application restart",
+        "existing notebook and LangGraph conversation survive restart"
+      ]
+    },
+    "p1-unpriced": {
+      "mode": "unpriced",
+      "passed": 4,
+      "checks": [
+        "environment change selects a new deployment default",
+        "changed default reaches provider without manual model setup",
+        "unknown model pricing remains unavailable while real usage persists",
+        "model change preserves historical attribution"
+      ]
+    },
+    "smoke": {
+      "passed": 7,
+      "checks": [
+        "API health",
+        "existing provider registry reachable",
+        "notebook create/read/update",
+        "text source submitted and processed by real worker",
+        "uploaded document processed and original download preserved",
+        "source context and existing chat session CRUD",
+        "synthetic notebook/source cleanup"
+      ],
+      "unrun": "Live LLM/embeddings/podcast calls require provider configuration"
+    }
+  },
+  "regressions": {
+    "backend_databridge": {
+      "passed": 1220,
+      "warnings": 2
+    },
+    "backend_base": {
+      "passed": 1070,
+      "skipped": 23,
+      "warnings": 2
+    },
+    "frontend": {
+      "passed": 200,
+      "files": 39
+    },
+    "ingestion_unit_integration_negative": {
+      "passed": 75
+    },
+    "native_motherduck_defense": {
+      "passed": 6
+    },
+    "postgres_independent_denials": {
+      "passed": 4,
+      "exit_codes": [
+        1,
+        1,
+        1,
+        2
+      ]
+    },
+    "ruff": "pass",
+    "format": "pass",
+    "mypy": {
+      "status": "pass",
+      "files": 193
+    },
+    "frontend_lint": {
+      "errors": 0,
+      "preexisting_warnings": 7
+    },
+    "docker_and_frontend_build": "pass"
+  },
+  "published_samples": [
+    {
+      "format": "csv",
+      "import_id": "db_import:cb7e37231d843a34b0c2e23f64d0dd6a892ab477",
+      "version_id": "6e3004f1-dfb2-4aaa-84d9-05406223fea7",
+      "connection_id": "db_connection:6e3004f1dfb24aaa84d905406223fea7",
+      "source_id": "source:6e3004f1dfb24aaa84d905406223fea7",
+      "raw_sha256": "ecf43192f09953390bdefa4426026f62c796db7c76d5e4369516e2412bda6456",
+      "raw_bytes": 140,
+      "retrieved_at": "2026-10-29T20:02:05.282335+00:00",
+      "database_sha256": "2ee84c572ae961b29c7920d22e53e32719984f17c7fc39502cde3a161219887d",
+      "schema_sha256": "97da293fbdab33951f6c36c343089a6c112ddcd46ecc9838faca39d9b0d8fa56",
+      "rows": 4,
+      "columns": [
+        {
+          "column": "c_1_report_year",
+          "original": "Report Year",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_2_ntd_id",
+          "original": "NTD ID",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_3_county_fips",
+          "original": "County FIPS",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_4_unlinked_passenger_trips",
+          "original": "Unlinked Passenger Trips",
+          "type": "BIGINT"
+        }
+      ],
+      "health_evidence_id": "db_query_run:ljfn1pg8kxot0bz48swe"
+    },
+    {
+      "format": "json",
+      "import_id": "db_import:65c470c4331916e916418206bfcc44fd5994f0f5",
+      "version_id": "2dd58000-7945-4872-8a16-497117e4a52d",
+      "connection_id": "db_connection:2dd58000794548728a16497117e4a52d",
+      "source_id": "source:2dd58000794548728a16497117e4a52d",
+      "raw_sha256": "607809d2daddf2a25bd94368671de8935b9528d5d2b51c65432e8df4c2f78c56",
+      "raw_bytes": 396,
+      "retrieved_at": "2026-10-29T20:02:11.288159+00:00",
+      "database_sha256": "f58b5186553908c82522ab1d4ab2f62ee348515e3057987f1acfe0b7d2855682",
+      "schema_sha256": "97da293fbdab33951f6c36c343089a6c112ddcd46ecc9838faca39d9b0d8fa56",
+      "rows": 4,
+      "columns": [
+        {
+          "column": "c_1_report_year",
+          "original": "Report Year",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_2_ntd_id",
+          "original": "NTD ID",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_3_county_fips",
+          "original": "County FIPS",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_4_unlinked_passenger_trips",
+          "original": "Unlinked Passenger Trips",
+          "type": "BIGINT"
+        }
+      ],
+      "health_evidence_id": "db_query_run:3qzo6hysgyl1gost3dxs"
+    },
+    {
+      "format": "parquet",
+      "import_id": "db_import:accc1dea3ecb39c13653ac90be2ab663593fd880",
+      "version_id": "4172691e-862e-4a2d-9184-3d1f75b2c3b6",
+      "connection_id": "db_connection:4172691e862e4a2d91843d1f75b2c3b6",
+      "source_id": "source:4172691e862e4a2d91843d1f75b2c3b6",
+      "raw_sha256": "0064328d8d060b86994ee2254c082e57b8cabd91bc3384177a76d6a9ab399ddd",
+      "raw_bytes": 628,
+      "retrieved_at": "2026-10-29T20:02:17.187468+00:00",
+      "database_sha256": "4b81bde6a0ccc179e0fd1c52dc0d93f5c41b09b64a334a854affdf57374e32b2",
+      "schema_sha256": "cd1e29d06019d1d001621792fe2f7cf2b0d24ef5444c527bf0fb3be226acb9c2",
+      "rows": 4,
+      "columns": [
+        {
+          "column": "c_1_report_year",
+          "original": "Report Year",
+          "type": "INTEGER"
+        },
+        {
+          "column": "c_2_ntd_id",
+          "original": "NTD ID",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_3_county_fips",
+          "original": "County FIPS",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_4_unlinked_passenger_trips",
+          "original": "Unlinked Passenger Trips",
+          "type": "INTEGER"
+        }
+      ],
+      "health_evidence_id": "db_query_run:sqdrevqqecn94fvp0jyx"
+    },
+    {
+      "format": "zip",
+      "import_id": "db_import:87b53a4cb8b6bad94d215b827edd9fd9ae6455d2",
+      "version_id": "ecb830b9-0c40-4211-b1fc-7a03bf70e5e4",
+      "connection_id": "db_connection:ecb830b90c404211b1fc7a03bf70e5e4",
+      "source_id": "source:ecb830b90c404211b1fc7a03bf70e5e4",
+      "raw_sha256": "d05ca884530d3adbd00404f305f76dca7bac1b0b450f494e2ec270806e010b72",
+      "raw_bytes": 258,
+      "retrieved_at": "2026-10-29T20:02:23.089163+00:00",
+      "database_sha256": "53dd08df8f388e52368980f582ed669632d50f89c744532aa22aaac4c50c97b9",
+      "schema_sha256": "97da293fbdab33951f6c36c343089a6c112ddcd46ecc9838faca39d9b0d8fa56",
+      "rows": 4,
+      "columns": [
+        {
+          "column": "c_1_report_year",
+          "original": "Report Year",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_2_ntd_id",
+          "original": "NTD ID",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_3_county_fips",
+          "original": "County FIPS",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_4_unlinked_passenger_trips",
+          "original": "Unlinked Passenger Trips",
+          "type": "BIGINT"
+        }
+      ],
+      "health_evidence_id": "db_query_run:ho0myfef9jynawcud8ls"
+    }
+  ],
+  "unrun": {
+    "browser": "The browser access host is unavailable",
+    "live_datagov_ntd": "No personal catalog key configured; owner authorized fixtures",
+    "live_gpt6_astra": "No live provider validation; cross-phase item",
+    "conversational_db_data_02": "Not implemented in Phase 3"
+  },
+  "fault_injection_notes": [
+    "SIGKILL interrupted a real worker download; persisted lease was advanced in the fixture to avoid a 15 minute wait before normal API recovery.",
+    "Native parser parent-death test kills only its parent and verifies kernel child termination.",
+    "Broker outage uses docker stop/start; revocation is a stored administrator disable and must remain disabled."
+  ]
+}

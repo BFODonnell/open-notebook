@@ -1,0 +1,4 @@
+REMOVE TABLE db_import;
+REMOVE TABLE db_catalog_cache;
+REMOVE TABLE db_resource;
+REMOVE TABLE db_catalog;

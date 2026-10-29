@@ -1,0 +1,8 @@
+# Opt-in standing approval only for the bundled, signature-pinned DuckDB broker.
+services:
+  open-notebook:
+    environment:
+      DATABRIDGE_INGESTION_ENABLED: 'true'
+      DATAGOV_API_KEY: ${DATAGOV_API_KEY:?Set a personal Data.gov API key}
+      DATABRIDGE_DUCKDB_TOKEN: ${DATABRIDGE_DUCKDB_TOKEN:?Set the scoped broker token}
+      DATABRIDGE_DOWNLOAD_HOSTS: ${DATABRIDGE_DOWNLOAD_HOSTS:-data.transportation.gov,transit.dot.gov,www.transit.dot.gov}

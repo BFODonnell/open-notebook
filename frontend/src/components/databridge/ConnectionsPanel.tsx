@@ -10,17 +10,19 @@ import { Connection, ConnectionSpec, Discovery, Evidence, mcpApi, QueryPlan } fr
 const blank: ConnectionSpec = { name: '', backend: 'dbhub', endpoint_ref: 'dbhub', dialect: 'postgres', notebooks: [], tables: {}, curated_tools: [], schema_tool: null, version_id: null, max_rows: 100, max_bytes: 65536, timeout_seconds: 10, enabled: true }
 const inputClass = 'w-full rounded border bg-background p-2 text-sm'
 
-export function ConnectionsPanel() {
+interface InitialSelection { initialNotebook?: string; initialConnection?: string; initialSql?: string }
+
+export function ConnectionsPanel(props: InitialSelection = {}) {
   const status = useMCPStatus()
   if (!status.data?.enabled) return null
-  return <ConnectionManager />
+  return <ConnectionManager {...props} />
 }
 
-function ConnectionManager() {
+function ConnectionManager({ initialNotebook = '', initialConnection = '', initialSql = 'SELECT value FROM sample' }: InitialSelection) {
   const { t } = useTranslation()
   const notebooks = useNotebooks(false)
-  const [notebook, setNotebook] = useState('')
-  const [selected, setSelected] = useState('')
+  const [notebook, setNotebook] = useState(initialNotebook)
+  const [selected, setSelected] = useState(initialConnection)
   const [adminDraft, setAdminDraft] = useState('')
   const [admin, setAdmin] = useState('')
   const [editing, setEditing] = useState<string | null>(null)
@@ -29,7 +31,7 @@ function ConnectionManager() {
   const [token, setToken] = useState('')
   const [discovery, setDiscovery] = useState<Discovery | null>(null)
   const [schema, setSchema] = useState<unknown>(null)
-  const [sql, setSql] = useState('SELECT value FROM sample')
+  const [sql, setSql] = useState(initialSql)
   const [tool, setTool] = useState('')
   const [parameters, setParameters] = useState('{}')
   const [plan, setPlan] = useState<QueryPlan | null>(null)

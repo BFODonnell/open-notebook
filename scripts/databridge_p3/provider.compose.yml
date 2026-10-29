@@ -1,0 +1,25 @@
+# Layer after P1 + P2 + P3 + scripts/databridge_p2/provider.compose.yml.
+# An isolated virtual network deliberately emulates public DNS/IP + verified TLS.
+# This grants no private-IP exception to production download code.
+services:
+  open-notebook:
+    environment:
+      DATABRIDGE_DOWNLOAD_CA_FILE: /test-ca/ca.pem
+    extra_hosts: ['api.gsa.gov:93.184.216.2', 'data.transportation.gov:93.184.216.2']
+    volumes: [./temp/databridge-p3/tls/ca.pem:/test-ca/ca.pem:ro]
+    networks: [publisher-fixture]
+    depends_on:
+      publisher-fixture: {condition: service_started}
+  publisher-fixture:
+    image: databridge-p2-tests:local
+    command: [/app/.venv/bin/uvicorn, scripts.databridge_p3.fixture:app, --host, 0.0.0.0, --port, '443', --ssl-keyfile, /tls/server.key, --ssl-certfile, /tls/server.pem]
+    working_dir: /workspace
+    volumes: [.:/workspace:ro, ./temp/databridge-p3/tls:/tls:ro]
+    networks:
+      publisher-fixture: {ipv4_address: 93.184.216.2}
+    mem_limit: 512m
+networks:
+  publisher-fixture:
+    internal: true
+    ipam:
+      config: [{subnet: 93.184.216.0/24}]

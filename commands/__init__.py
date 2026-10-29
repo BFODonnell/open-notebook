@@ -8,6 +8,7 @@ from open_notebook.utils.proxy import ensure_internal_no_proxy
 
 ensure_internal_no_proxy()
 
+from .databridge_commands import import_dataset_command
 from .embedding_commands import (
     embed_insight_command,
     embed_note_command,
@@ -18,6 +19,7 @@ from .podcast_commands import generate_podcast_command
 from .source_commands import process_source_command
 
 __all__ = [
+    "import_dataset_command",
     # Embedding commands
     "embed_note_command",
     "embed_insight_command",

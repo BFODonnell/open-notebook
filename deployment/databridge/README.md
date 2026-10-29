@@ -114,3 +114,11 @@ Exact behavior is tested against the pinned image, not inferred from latest docs
 The optional [MCP deployment guide](mcp/README.md) documents the Phase 2 overlay,
 connection administration, SQL policy, immutable dataset versions and recovery.
 The Phase 1 instructions above remain authoritative for the model gateway.
+
+## Phase 3 extension
+
+The [Open Data Explorer deployment guide](ingestion/README.md) documents direct
+Data.gov discovery, bounded automated imports, notebook attachment, immutable
+publication, provenance and interrupted-job recovery. It layers on Phase 2 and
+preserves the existing model gateway. See the [Phase 3 report](../../docs/databridge/PHASE_3_REPORT.md)
+for fixture acceptance and outstanding live/browser checks.
