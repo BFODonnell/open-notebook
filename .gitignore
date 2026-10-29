@@ -1,5 +1,6 @@
 .env
 .env.databridge
+.env.databridge-live-validation
 prompts/patterns/user/
 /notebooks/
 data/

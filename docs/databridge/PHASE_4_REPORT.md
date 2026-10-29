@@ -5,6 +5,11 @@ P0 audit/publication architecture, P1 gateway and P2 MCP authorization decisions
 The approved design package and owner's untracked `design/` remain unchanged.
 **Phase 5 has not begun.**
 
+Follow-up: after this fixture report, the owner configured a Data.gov key and the
+official FTA NTD CSV passed live API/worker/MCP import and restart validation.
+See [live report](LIVE_NTD_VALIDATION.md). Historical fixture results below remain
+unchanged; no live GPT-6 Astra or browser claim is added.
+
 ## Outcome and scope
 
 The bounded DB-DATA-02 workflow is implemented in existing notebook chat:

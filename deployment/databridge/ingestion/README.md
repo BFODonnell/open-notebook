@@ -103,8 +103,12 @@ version/evidence records remain. Migration 27 runs on startup. Its down migratio
 deletes ingestion records and is **not** routine feature-disable or recovery.
 
 DB-DATA-01 is available for this bounded format subset. The context endpoint
-`GET /api/databridge/notebooks/{id}/datasets/context` prepares DB-DATA-02; chat does
-not yet discover, plan, query and synthesize answers automatically. Existing SQL
+`GET /api/databridge/notebooks/{id}/datasets/context` supplies DB-DATA-02. The opt-in
+[Phase 4 research overlay](../research/README.md) adds discovery, SQL planning,
+explicit approval and verified answers in existing notebook chat. Existing SQL
 policy permits one table and explicit approval. Do not advertise cross-source joins.
+
+The official FTA 2022-2025 service CSV passed live API/worker/MCP import and restart
+validation on 2026-10-29. See the [observed snapshot and analytical limitations](../../../docs/databridge/LIVE_NTD_VALIDATION.md).
 
 Repeatable tests: [Phase 3 acceptance](../../../scripts/databridge_p3/README.md).

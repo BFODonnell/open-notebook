@@ -1,0 +1,514 @@
+{
+  "validated_at": "2026-10-29T23:06:35.739791+00:00",
+  "scope": "Live official Data.gov and FTA export; application API, real worker and MCP; no browser or live model claim",
+  "title": "2022 - 2025 NTD Annual Data - Service (by Mode and Time Period)",
+  "catalog_metadata": {
+    "identifier": "https://data.transportation.gov/api/views/wwdp-t4re",
+    "publisher": {
+      "@id": "https://data.transportation.gov/user/cvni-9g72",
+      "@type": "Organization",
+      "name": "Federal Transit Administration"
+    },
+    "modified": "2026-10-14",
+    "temporal": null,
+    "spatial": "{\"@type\": \"Location\", \"prefLabel\": \"United States\"}",
+    "accessLevel": "public",
+    "rights": [
+      "public"
+    ]
+  },
+  "notebook_id": "notebook:a5g7c625exzidbib0l0l",
+  "import_id": "db_import:2d93ef67c6e209da3dec3437b4b5fc257754212c",
+  "status": "ready",
+  "source_id": "source:0230e685eeeb4b2aaaff7af3e25a4096",
+  "version_id": "0230e685-eeeb-4b2a-aaff-7af3e25a4096",
+  "connection_id": "db_connection:0230e685eeeb4b2aaaff7af3e25a4096",
+  "download": {
+    "bytes": 19906329,
+    "content_type": "text/csv",
+    "etag": "W/\"mm-nXwaZP2gfX63sd-BS5QgUzEQcVQ3Xh-5ZsHhJvYs--gzip\"",
+    "final_url": "https://data.transportation.gov/api/v3/views/wwdp-t4re/export.csv?accessType=DOWNLOAD",
+    "last_modified": "Thu, 29 Oct 2026 23:04:54 GMT",
+    "retrieved_at": "2026-10-29T23:05:00.311267+00:00",
+    "sha256": "b3285c378ebd774447d4b7547dad7db04c7578282734f068e20333970c2aa583"
+  },
+  "rows": 51716,
+  "columns": [
+    {
+      "column": "c_1_agency",
+      "original": "Agency",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_2_ntd_id",
+      "original": "NTD ID",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_3_reporter_type",
+      "original": "Reporter Type",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_4_organization_type",
+      "original": "Organization Type",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_5_city",
+      "original": "City",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_6_state",
+      "original": "State",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_7_report_year",
+      "original": "Report Year",
+      "type": "BIGINT"
+    },
+    {
+      "column": "c_8_agency_voms",
+      "original": "Agency VOMS",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_9_mode",
+      "original": "Mode",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_10_mode_name",
+      "original": "Mode Name",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_11_type_of_service",
+      "original": "Type Of Service",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_12_mode_voms",
+      "original": "Mode VOMS",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_13_mode_voms_questionable",
+      "original": "Mode VOMS Questionable",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_14_uace_code",
+      "original": "UACE Code",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_15_uza_name",
+      "original": "UZA Name",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_16_uza_area_sq_miles",
+      "original": "UZA Area Sq Miles",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_17_uza_population",
+      "original": "UZA Population",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_18_service_area_sq_miles",
+      "original": "Service Area Sq Miles",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_19_service_area_population",
+      "original": "Service Area Population",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_20_time_period",
+      "original": "Time Period",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_21_time_service_begins",
+      "original": "Time Service Begins",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_22_time_service_ends",
+      "original": "Time Service Ends",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_23_actual_vehicle_passenger_car_miles",
+      "original": "Actual Vehicle/Passenger Car Miles",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_24_vehicle_miles_questionable",
+      "original": "Vehicle Miles Questionable",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_25_actual_vehicle_passenger_car_revenue_miles",
+      "original": "Actual Vehicle/Passenger Car Revenue Miles",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_26_vehicle_revenue_miles_questionable",
+      "original": "Vehicle Revenue Miles Questionable",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_27_actual_vehicle__passenger_deadhead_miles",
+      "original": "Actual Vehicle/ Passenger Deadhead Miles",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_28_deadhead_miles_questionable",
+      "original": "Deadhead Miles Questionable",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_29_scheduled_vehicle_passenger_car_revenue_miles",
+      "original": "Scheduled Vehicle/Passenger Car Revenue Miles",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_30_scheduled_revenue_miles_questionable",
+      "original": "Scheduled Revenue Miles Questionable",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_31_actual_vehicles__passenger_car_hours",
+      "original": "Actual Vehicles/ Passenger Car Hours",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_32_vehicle_hours_questionable",
+      "original": "Vehicle Hours Questionable",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_33_actual_vehicle_passenger_car_revenue_hours",
+      "original": "Actual Vehicle/Passenger Car Revenue Hours",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_34_vehicle_revenue_hours_questionable",
+      "original": "Vehicle Revenue Hours Questionable",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_35_actual_vehicle_passenger_car_deadhead_hours",
+      "original": "Actual Vehicle/Passenger Car Deadhead Hours",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_36_deadhead_hours_questionable",
+      "original": "Deadhead Hours Questionable",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_37_charter_service_hours",
+      "original": "Charter Service Hours",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_38_school_bus_hours",
+      "original": "School Bus Hours",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_39_trains_in_operation",
+      "original": "Trains In Operation",
+      "type": "BIGINT"
+    },
+    {
+      "column": "c_40_trains_in_operation_questionable",
+      "original": "Trains in Operation Questionable",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_41_train_miles",
+      "original": "Train Miles",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_42_train_miles_questionable",
+      "original": "Train Miles Questionable",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_43_train_revenue_miles",
+      "original": "Train Revenue Miles",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_44_train_revenue_miles_questionable",
+      "original": "Train Revenue Miles Questionable",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_45_train_deadhead_miles",
+      "original": "Train Deadhead Miles",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_46_train_hours",
+      "original": "Train Hours",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_47_train_hours_questionable",
+      "original": "Train Hours Questionable",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_48_train_revenue_hours",
+      "original": "Train Revenue Hours",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_49_train_revenue_hours_questionable",
+      "original": "Train Revenue Hours Questionable",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_50_train_deadhead_hours",
+      "original": "Train Deadhead Hours",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_51_unlinked_passenger_trips__upt",
+      "original": "Unlinked Passenger Trips (UPT)",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_52_unlinked_passenger_trips_questionable",
+      "original": "Unlinked Passenger Trips Questionable",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_53_ada_upt",
+      "original": "ADA UPT",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_54_sponsored_service_upt",
+      "original": "Sponsored Service UPT",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_55_passenger_miles_traveled",
+      "original": "Passenger Miles Traveled",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_56_passenger_miles_questionable",
+      "original": "Passenger Miles Questionable",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_57_directional_route_miles",
+      "original": "Directional Route Miles",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_58_directional_route_miles_questionable",
+      "original": "Directional Route Miles Questionable",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_59_brt_non_statutory_mixed_traffic_miles",
+      "original": "BRT Non-Statutory Mixed Traffic Miles",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_60_mixed_traffic_right_of_way_miles",
+      "original": "Mixed Traffic Right-of-Way Miles",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_61_days_of_service_operated",
+      "original": "Days Of Service Operated",
+      "type": "BIGINT"
+    },
+    {
+      "column": "c_62_days_not_operated___strikes",
+      "original": "Days Not Operated - Strikes",
+      "type": "BIGINT"
+    },
+    {
+      "column": "c_63_days_not_operated___emergencies",
+      "original": "Days Not Operated - Emergencies",
+      "type": "BIGINT"
+    },
+    {
+      "column": "c_64_average_revenue_speed",
+      "original": "Average Revenue Speed",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_65_average_revenue_speed_questionable",
+      "original": "Average Revenue Speed Questionable",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_66_average_passenger_trip_length__aptl",
+      "original": "Average Passenger Trip Length (APTL)",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_67_aptl_questionable",
+      "original": "APTL Questionable",
+      "type": "VARCHAR"
+    },
+    {
+      "column": "c_68_passengers_per_vehicle_revenue_hour",
+      "original": "Passengers per Vehicle Revenue Hour",
+      "type": "BIGINT"
+    },
+    {
+      "column": "c_69_passengers_per_hour_questionable",
+      "original": "Passengers per Hour Questionable",
+      "type": "VARCHAR"
+    }
+  ],
+  "manifest": {
+    "version_id": "0230e685-eeeb-4b2a-aaff-7af3e25a4096",
+    "sha256": "0b03c4656c390de996d1c1d615f64dc44585788295d45bb18414a2b16d8e45b2",
+    "schema_sha256": "18b1f7f368a42b03b64613b497bbb6e002a25e566a7dceec629344933983126f",
+    "bytes": 4468736
+  },
+  "history": [
+    {
+      "at": "2026-10-29T23:04:53.568421+00:00",
+      "stage": "queued"
+    },
+    {
+      "at": "2026-10-29T23:04:53.729544+00:00",
+      "stage": "resolving"
+    },
+    {
+      "at": "2026-10-29T23:04:53.779809+00:00",
+      "stage": "downloading"
+    },
+    {
+      "at": "2026-10-29T23:05:00.332985+00:00",
+      "stage": "validating"
+    },
+    {
+      "at": "2026-10-29T23:05:00.381100+00:00",
+      "stage": "parsing"
+    },
+    {
+      "at": "2026-10-29T23:05:02.787796+00:00",
+      "stage": "staging"
+    },
+    {
+      "at": "2026-10-29T23:05:02.852906+00:00",
+      "stage": "profiling"
+    },
+    {
+      "at": "2026-10-29T23:05:02.916357+00:00",
+      "stage": "publishing"
+    },
+    {
+      "at": "2026-10-29T23:05:03.062750+00:00",
+      "stage": "registering"
+    },
+    {
+      "at": "2026-10-29T23:05:05.924987+00:00",
+      "stage": "ready"
+    }
+  ],
+  "query": {
+    "id": "db_query_run:t4zbs1p17099fv6o6arj",
+    "bytes": 109,
+    "completed_at": "2026-10-29T23:05:41.162927+00:00",
+    "connection_id": "db_connection:0230e685eeeb4b2aaaff7af3e25a4096",
+    "dataset_sha256": "0b03c4656c390de996d1c1d615f64dc44585788295d45bb18414a2b16d8e45b2",
+    "fingerprint": "70f188bb6eed37fdfac4e2e1d26786dacfa5c0d02dc54ffe6086ad8ae24e1633",
+    "notebook_id": "notebook:a5g7c625exzidbib0l0l",
+    "parameters": {},
+    "plan_id": "db_query_plan:9nr91jjdfetamys38sfw",
+    "policy": "databridge-select-v1",
+    "result_sha256": "4abf6a6605b78941688a27131529ec98aad794bda496cf36082a92262e883df9",
+    "revision": "ac4cfbb4-8a55-4d07-bae5-e4894a187ffd",
+    "row_count": 4,
+    "rows": [
+      {
+        "rows": 12906,
+        "year": 2022
+      },
+      {
+        "rows": 12801,
+        "year": 2023
+      },
+      {
+        "rows": 12966,
+        "year": 2024
+      },
+      {
+        "rows": 13043,
+        "year": 2025
+      }
+    ],
+    "sql": "SELECT \"c_7_report_year\" AS \"year\", COUNT(*) AS \"rows\" FROM \"data\" GROUP BY \"c_7_report_year\" ORDER BY \"c_7_report_year\" LIMIT 100",
+    "status": "success",
+    "timestamp": "2026-10-29T23:05:39.159725+00:00",
+    "version_id": "0230e685-eeeb-4b2a-aaff-7af3e25a4096"
+  },
+  "after_restart": {
+    "id": "db_query_run:ll3x8os2voozlk9hvha5",
+    "bytes": 109,
+    "completed_at": "2026-10-29T23:06:35.739791+00:00",
+    "connection_id": "db_connection:0230e685eeeb4b2aaaff7af3e25a4096",
+    "dataset_sha256": "0b03c4656c390de996d1c1d615f64dc44585788295d45bb18414a2b16d8e45b2",
+    "fingerprint": "70f188bb6eed37fdfac4e2e1d26786dacfa5c0d02dc54ffe6086ad8ae24e1633",
+    "notebook_id": "notebook:a5g7c625exzidbib0l0l",
+    "parameters": {},
+    "plan_id": "db_query_plan:3i5d3wpofkv1m78cdnd4",
+    "policy": "databridge-select-v1",
+    "result_sha256": "4abf6a6605b78941688a27131529ec98aad794bda496cf36082a92262e883df9",
+    "revision": "ac4cfbb4-8a55-4d07-bae5-e4894a187ffd",
+    "row_count": 4,
+    "rows": [
+      {
+        "rows": 12906,
+        "year": 2022
+      },
+      {
+        "rows": 12801,
+        "year": 2023
+      },
+      {
+        "rows": 12966,
+        "year": 2024
+      },
+      {
+        "rows": 13043,
+        "year": 2025
+      }
+    ],
+    "sql": "SELECT \"c_7_report_year\" AS \"year\", COUNT(*) AS \"rows\" FROM \"data\" GROUP BY \"c_7_report_year\" ORDER BY \"c_7_report_year\" LIMIT 100",
+    "status": "success",
+    "timestamp": "2026-10-29T23:06:33.474647+00:00",
+    "version_id": "0230e685-eeeb-4b2a-aaff-7af3e25a4096"
+  },
+  "verification": {
+    "worker_command_id": "command:6jzwmdaum7btbr5bpuun",
+    "worker_status": "completed",
+    "download_hash_matches_preview": true,
+    "notebook_source_linked": true,
+    "immutable_version_matches_manifest": true,
+    "processing_stages_present": true
+  },
+  "notebook_context_enabled": true
+}

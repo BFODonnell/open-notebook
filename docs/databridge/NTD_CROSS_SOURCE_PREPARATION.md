@@ -1,8 +1,10 @@
 # NTD 2022-2025 and subsequent Census/NOAA preparation
 
 Reviewed 2026-10-29. No cross-source comparison has been constructed. The owner
-authorized synthetic fixtures for Phase 3 acceptance because no Data.gov key is
-configured. The four-row fixture is explicitly synthetic and does not represent
+authorized synthetic fixtures for Phase 3 acceptance because no Data.gov key was
+then configured. A subsequent [live validation](LIVE_NTD_VALIDATION.md) imported the
+official FTA candidate after the owner supplied a key. The four-row fixture remains
+explicitly synthetic and does not represent
 actual transit service, agency coverage or county statistics.
 
 ## First live candidate
@@ -16,14 +18,16 @@ is `wwdp-t4re`. The catalog lists JSON, XML and CSV resources; CSV is the initia
 candidate, while XML requires an adapter. The CSV download is on the approved
 `data.transportation.gov` host under `/api/v3/views/wwdp-t4re/export.csv`.
 
-Live export byte count, row count and complete schema are **unverified**, and
-import is not pre-enabled on these metadata claims. Live acceptance must run the
-in-app bounded preview, record size/hash/actual years/schema and then import. An
+Live acceptance subsequently measured **19,906,329 bytes, 51,716 rows and 69 columns**,
+confirmed Report Year 2022-2025 through MCP, and verified restart persistence.
+Full hashes/schema/provenance are in the [live report](LIVE_NTD_VALIDATION.md).
+Each later import must still pass bounded preview and publication checks. An
 export exceeding 32 MiB, 250,000 rows or 100 columns needs a reviewed subsetting
 adapter; do not lift limits or silently truncate. No command-line ingestion or
 manually registered database substitutes for this demonstration. The publisher
 metadata endpoint was unavailable through the research browser tool during this
-session, and there is no configured personal catalog API key.
+initial Phase 3 session; the subsequent live check used the application's backend
+download path and the owner's configured personal catalog key successfully.
 
 ## Compatibility checklist before comparison
 
@@ -85,8 +89,8 @@ consistent 2025 vintage for 2022-2025 where the exact geography and estimates ar
 available. If unavailable, restrict to the approved overlapping 2022-2024 years
 and disclose the gap. The ACS example above documents an adapter/temporal pitfall;
 it is not a silent replacement for that PEP decision. Live availability is still
-unverified. The owner now has a catalog key; it must be configured separately from
-fixture DNS/TLS before live acquisition can be tested.
+unverified for PEP. Live NTD acquisition has now passed separately from fixture
+DNS/TLS; this does not validate a Census denominator or NOAA mapping.
 
 Prefer a reviewed materialized table over enabling joins in chat. The relationship
 contract for a subsequent implementation must include:
