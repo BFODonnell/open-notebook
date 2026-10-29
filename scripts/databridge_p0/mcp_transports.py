@@ -288,4 +288,9 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
+    if os.name == "nt":
+        raise SystemExit(
+            "Use Dockerfile.transports on Windows. The native OpenSSL failure can "
+            "terminate Python without running container cleanup."
+        )
     asyncio.run(main())

@@ -93,6 +93,14 @@ data, with no LLM calls or fake external provider responses.
   `OPENSSL_Uplink(...): no OPENSSL_Applink`. Certificate/PATH/OpenSSL-env experiments
   did not provide a reliable fix. Linux/Docker is the tested backend environment;
   this host-specific issue is not a blocker for that selected runtime.
+  Native transport attempts terminated below Python's `finally`, leaving nine
+  test containers; these were identified by exact mounts and removed. Automatic
+  approval review rejected a combined recursive cleanup command as "blocked by
+  policy", so the three small synthetic temporary directories remain under
+  `C:/Users/StSix/AppData/Local/Temp/`: `databridge-mcp-p0-wfsae3m5`,
+  `databridge-mcp-p0-wdv3l703`, `databridge-mcp-p0-w1h29hqa`.
+  The transport harness now refuses native
+  Windows execution before starting containers; use its Linux image.
 - Inherited Anaconda `SSL_CERT_FILE` caused uv download failures. Removing it only
   for the command and using `uv --native-tls` succeeded. npm required
   `NODE_USE_SYSTEM_CA=1`. TLS verification was never disabled.
