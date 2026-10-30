@@ -1,0 +1,109 @@
+{
+  "validated_at": "2026-10-30T00:35:56.463363+00:00",
+  "provider": "OpenRouter",
+  "provider_model": "openai/gpt-6-astra",
+  "model_alias": "openrouter-gpt-6-astra",
+  "source_answer": "This source contains schema and provenance documentation for the Federal Transit Administration\u2019s \u201c2022\u20132025 NTD Annual Data\u2014Service (by Mode and Time Period)\u201d dataset, including publisher and download details, a reported row count, and column names and data types for agency, service, ridership, and data-quality fields [source:0230e685eeeb4b2aaaff7af3e25a4096]. It does not contain raw database records or query results, so it provides no observed ridership figures to report [source:0230e685eeeb4b2aaaff7af3e25a4096].",
+  "source_session": "chat_session:l6o9nps5ss2h816sc5y1",
+  "notebook_session": "chat_session:om0dav0cl1hx5bm431mh",
+  "version_id": "0230e685-eeeb-4b2a-aaff-7af3e25a4096",
+  "research": {
+    "id": "db_research_turn:34d77ccb894f4a7ebde5ef6a8b5c8701",
+    "state": "completed",
+    "question": "How many records are present in each Report Year in the imported NTD dataset? Count rows only, group and order by Report Year, include all years. Do not calculate ridership or compare sources.",
+    "answer": "Database evidence for 2022 - 2025 NTD Annual Data - Service \\(by Mode and Time Period\\).\n\nThe executed query returned these verified values:\n\n- Result row 1, year: 2022.\n\n- Result row 1, record\\_count: 12906.\n\n- Result row 2, year: 2023.\n\n- Result row 2, record\\_count: 12801.\n\n- Result row 3, year: 2024.\n\n- Result row 3, record\\_count: 12966.\n\n- Result row 4, year: 2025.\n\n- Result row 4, record\\_count: 13043.\n\nAcross the returned years 2022 to 2025, record\\_count changed by 137. Missing years are not treated as zero.\n\nAttribution: dataset 077b6d37-3262-565c-ac92-82b9874a042c; immutable version 0230e685-eeeb-4b2a-aaff-7af3e25a4096; evidence db_query_run:wu4aw495y299x4pn2gaj; query plan db_query_plan:82iwrsbc69srhv655sfm.\n\nExecuted SQL:\n```sql\nSELECT \"c_7_report_year\" AS \"year\", COUNT(*) AS \"record_count\" FROM \"data\" GROUP BY \"c_7_report_year\" ORDER BY \"c_7_report_year\" LIMIT 100\n```\n\nResult SHA-256: f6e561649ffd6d23dd42465fbf739fb9967bde846afa9037dc586afc8967cb29. Database SHA-256: 0b03c4656c390de996d1c1d615f64dc44585788295d45bb18414a2b16d8e45b2.\n\nThese findings describe only the selected dataset and returned query scope. Synthetic fixtures are not official DOT findings. Geography, time support and units are not certified for cross-source comparisons; no causal inference is made.",
+    "evidence": {
+      "bytes": 141,
+      "completed_at": "2026-10-30T00:35:56.463363+00:00",
+      "connection_id": "db_connection:0230e685eeeb4b2aaaff7af3e25a4096",
+      "dataset_sha256": "0b03c4656c390de996d1c1d615f64dc44585788295d45bb18414a2b16d8e45b2",
+      "fingerprint": "70f188bb6eed37fdfac4e2e1d26786dacfa5c0d02dc54ffe6086ad8ae24e1633",
+      "id": "db_query_run:wu4aw495y299x4pn2gaj",
+      "notebook_id": "notebook:a5g7c625exzidbib0l0l",
+      "parameters": {},
+      "plan_id": "db_query_plan:82iwrsbc69srhv655sfm",
+      "policy": "databridge-select-v1",
+      "result_sha256": "f6e561649ffd6d23dd42465fbf739fb9967bde846afa9037dc586afc8967cb29",
+      "revision": "ac4cfbb4-8a55-4d07-bae5-e4894a187ffd",
+      "row_count": 4,
+      "rows": [
+        {
+          "record_count": 12906,
+          "year": 2022
+        },
+        {
+          "record_count": 12801,
+          "year": 2023
+        },
+        {
+          "record_count": 12966,
+          "year": 2024
+        },
+        {
+          "record_count": 13043,
+          "year": 2025
+        }
+      ],
+      "sql": "SELECT \"c_7_report_year\" AS \"year\", COUNT(*) AS \"record_count\" FROM \"data\" GROUP BY \"c_7_report_year\" ORDER BY \"c_7_report_year\" LIMIT 100",
+      "status": "success",
+      "timestamp": "2026-10-30T00:35:53.694343+00:00",
+      "version_id": "0230e685-eeeb-4b2a-aaff-7af3e25a4096"
+    },
+    "verification": {
+      "method": "exact-result-cell-and-document-excerpt",
+      "result_sha256": "f6e561649ffd6d23dd42465fbf739fb9967bde846afa9037dc586afc8967cb29"
+    }
+  },
+  "usage": [
+    {
+      "request_id": "gen-1793320557-rxitSBz2776tGtOKgmtl",
+      "timestamp": "2026-10-30T00:35:56.607+00:00",
+      "model": "openrouter/openai/gpt-6-astra",
+      "model_alias": "openrouter-gpt-6-astra",
+      "trace_id": "827327c7-bbe6-4469-a2d6-c58e9b279afa",
+      "notebook_id": "notebook:a5g7c625exzidbib0l0l",
+      "session_id": "chat_session:om0dav0cl1hx5bm431mh",
+      "task": "database_synthesize",
+      "input_tokens": 3609,
+      "output_tokens": 121,
+      "cached_input_tokens": 0,
+      "reasoning_tokens": 0,
+      "estimated_cost_usd": 0.051155,
+      "pricing_status": "estimated",
+      "status": "success",
+      "latency_ms": 1837.0,
+      "retries": 0,
+      "error_code": null,
+      "pricing_snapshot": {
+        "input_cost_per_token": 1e-05,
+        "output_cost_per_token": 5e-05
+      }
+    },
+    {
+      "request_id": "gen-1793320551-GuU3DivG52Y8RuvdUxwn",
+      "timestamp": "2026-10-30T00:35:50.600+00:00",
+      "model": "openrouter/openai/gpt-6-astra",
+      "model_alias": "openrouter-gpt-6-astra",
+      "trace_id": "884c18c0-1d9e-420c-abf8-4dd821703d10",
+      "notebook_id": "notebook:a5g7c625exzidbib0l0l",
+      "session_id": "chat_session:om0dav0cl1hx5bm431mh",
+      "task": "database_plan",
+      "input_tokens": 3126,
+      "output_tokens": 83,
+      "cached_input_tokens": 0,
+      "reasoning_tokens": 0,
+      "estimated_cost_usd": 0.0432175,
+      "pricing_status": "estimated",
+      "status": "success",
+      "latency_ms": 2141.0,
+      "retries": 0,
+      "error_code": null,
+      "pricing_snapshot": {
+        "input_cost_per_token": 1e-05,
+        "output_cost_per_token": 5e-05
+      }
+    }
+  ],
+  "budget_limit_usd": 20.0,
+  "restart_verified": true
+}

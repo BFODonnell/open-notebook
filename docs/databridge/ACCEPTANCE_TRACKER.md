@@ -5,7 +5,7 @@ documented demonstration scope; external gates are not silently waived.
 
 | Item | Status | Completion evidence required |
 |---|---|---|
-| Live GPT-6 Astra through Esperanto -> LiteLLM | Outstanding from P1 | Authorized live model/account, actual requests, provider usage/pricing availability, failure handling and semantic planning quality. Deterministic fixtures do not certify access, billing or model competence. |
+| Live GPT-6 Astra through Esperanto -> LiteLLM | Passed for the bounded OpenRouter scenario, 2026-10-29 | [Live evidence](LIVE_OPENROUTER_VALIDATION.md): real source chat, count-query planning, approved MCP execution and verified synthesis, tokens/estimated costs and restart persistence. Arbitrary questions, every pricing tier and live outage behavior are not certified; prior controlled failure tests remain applicable. |
 | Browser end-to-end verification | Outstanding across P1-P4 | Usage, connection administration/discovery/schema/approval/evidence and full Explorer -> import -> chat -> review/approve -> verified answer. P4 browser connector returned `The browser access host is unavailable`. Native Chrome fallback stopped because it could not determine the current URL confidently enough to enforce policy. No browser acceptance is claimed. |
 | SQL Server multi-catalog and other DBHub engines | Uncertified | Real engines, independent least-privilege catalog connections, scoped discovery/query and negative permissions tests. Not enabled by the current SQL execution path. |
 | Human translations of MCP, Explorer and research UI | Outstanding | Review all 14 locales. Key parity is tested; new strings currently have explicit English text. |

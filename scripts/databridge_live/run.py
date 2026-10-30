@@ -16,6 +16,8 @@ PROJECT = "databridge-live-validation"
 
 def main():
     os.chdir(ROOT)
+    if sys.argv[1:] not in (["up"], ["stop"]):
+        raise SystemExit("Usage: uv run python scripts/databridge_live/run.py up|stop")
     key = dotenv_values(ROOT / ".env.databridge").get("DATAGOV_API_KEY")
     if not key or key in {"DEMO_KEY", "your-key-here"}:
         raise SystemExit("A personal DATAGOV_API_KEY is required in .env.databridge")
@@ -74,6 +76,62 @@ def main():
         "scripts/databridge_live/compose.yml",
     ):
         args += ["-f", compose_file]
+    credential_id = env.get("DATABRIDGE_OPENROUTER_CREDENTIAL")
+    if credential_id:
+        if env.get("OPENAI_API_BASE") != "https://openrouter.ai/api/v1" or not env.get(
+            "LLM_PROVIDER_MODEL", ""
+        ).startswith("openrouter/"):
+            raise SystemExit(
+                "Stored OpenRouter credentials require the official OpenRouter endpoint"
+            )
+        if sys.argv[1:] == ["up"]:
+            # Reuse the application's existing DB network, credentials and encryption
+            # implementation. This also works after a complete stack shutdown.
+            subprocess.run(
+                args + ["up", "-d", "--no-build", "--wait", "surrealdb"],
+                env=env,
+                check=True,
+            )
+            reader = """import asyncio, os, sys
+from loguru import logger
+logger.remove()
+from open_notebook.domain.credential import Credential
+async def read():
+    credential = await Credential.get(os.environ["DATABRIDGE_OPENROUTER_CREDENTIAL"])
+    if credential.provider != "openrouter" or not credential.api_key:
+        raise ValueError()
+    sys.stdout.write(credential.api_key.get_secret_value())
+try:
+    asyncio.run(read())
+except Exception:
+    sys.exit(1)
+"""
+            fetched = subprocess.run(
+                args
+                + [
+                    "run",
+                    "--rm",
+                    "--no-deps",
+                    "-T",
+                    "-e",
+                    "DATABRIDGE_OPENROUTER_CREDENTIAL",
+                    "--entrypoint",
+                    "/app/.venv/bin/python",
+                    "open-notebook",
+                    "-",
+                ],
+                input=reader,
+                env=env,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            if fetched.returncode or not fetched.stdout.strip().startswith("sk-or-"):
+                raise SystemExit(
+                    "Could not load the encrypted OpenRouter credential; no provider request was made"
+                )
+            # Never write the decrypted provider key to disk or terminal output.
+            env["OPENAI_API_KEY"] = fetched.stdout.strip()
     # Inspect in memory only: rendered Compose includes secrets and must not be logged.
     rendered = subprocess.run(
         args + ["config", "--format", "json"],
@@ -94,11 +152,13 @@ def main():
         raise SystemExit(
             "Live catalog credentials cannot be used with fixture DNS or TLS"
         )
-    if (
+    if not credential_id and (
         services["litellm"]["environment"]["OPENAI_API_BASE"]
         != "http://fixture:8080/v1"
     ):
-        raise SystemExit("This validation requires the local model fixture")
+        raise SystemExit(
+            "Configure a stored OpenRouter credential before enabling a live model"
+        )
     if sys.argv[1:] == ["up"]:
         args += [
             "up",

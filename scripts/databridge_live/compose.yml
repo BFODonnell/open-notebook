@@ -1,9 +1,9 @@
-# Live Data.gov/publisher; deterministic model only. No catalog fixture or DNS overrides.
+# Live Data.gov/publisher; no synthetic answers. No catalog fixture or DNS overrides.
 services:
   fixture:
     image: databridge-p0-baseline:local
     working_dir: /app
-    command: [/app/.venv/bin/uvicorn, scripts.databridge_p1.fixture:app, --host, 0.0.0.0, --port, '8080']
+    command: [/app/.venv/bin/uvicorn, scripts.databridge_live.model_unconfigured:app, --host, 0.0.0.0, --port, '8080']
     volumes: [./scripts:/app/scripts:ro]
     networks: [egress]
     mem_limit: 256m

@@ -83,6 +83,10 @@ remaining database certification are still outstanding.
 
 ## Browser connection correction
 
+Subsequent owner-authorized [GPT-6 Astra validation](LIVE_OPENROUTER_VALIDATION.md)
+replaced the model placeholder with the saved OpenRouter credential through
+LiteLLM. The original acquisition evidence above remains unchanged.
+
 The owner subsequently found the UI's API connection error. Container-local API
 acceptance had missed that `/config` advertised the default host port 5055 while
 the live stack published the API on 15056. Compose now supplies runtime `API_URL`
