@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DataBridge Importability",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "status",
+    "reason"
+  ],
+  "properties": {
+    "status": {
+      "enum": [
+        "checking",
+        "ready",
+        "connector_required",
+        "unavailable"
+      ]
+    },
+    "reason": {
+      "type": "string"
+    },
+    "adapter": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "format": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "estimated_bytes": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "checked_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    }
+  }
+}

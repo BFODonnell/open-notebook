@@ -1,0 +1,460 @@
+openapi: 3.1.0
+info:
+  title: Open Notebook DataBridge API (proposed)
+  version: 1.0.0-design
+  description: >-
+    Design contract for new endpoints; not implemented upstream. Must be reconciled
+    with Open Notebook's existing authentication, routing conventions, jobs and chat API.
+servers:
+  - url: /api/databridge
+security:
+  - AppSession: []
+tags:
+  - name: Catalog
+  - name: Imports
+  - name: Datasets
+  - name: MCP
+  - name: Research
+  - name: Usage
+paths:
+  /catalog/search:
+    get:
+      tags: [Catalog]
+      operationId: searchDataGov
+      summary: Search the Data.gov v4 catalog via server-side authenticated client
+      parameters:
+        - {name: q, in: query, schema: {type: string, maxLength: 300}}
+        - {name: org_slug, in: query, schema: {type: string, maxLength: 100}}
+        - {name: per_page, in: query, schema: {type: integer, minimum: 1, maximum: 100, default: 10}}
+        - {name: after, in: query, schema: {type: string, maxLength: 2048}}
+      responses:
+        '200':
+          description: Catalog search result page with cursor
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [results]
+                properties:
+                  results:
+                    type: array
+                    items: {$ref: '#/components/schemas/CatalogCard'}
+                  after: {type: [string, 'null']}
+        default: {$ref: '#/components/responses/Error'}
+  /catalog/datasets/{dataset_ref}:
+    get:
+      tags: [Catalog]
+      summary: Retrieve a DataBridge-cached dataset metadata record, not an upstream Data.gov detail endpoint
+      parameters:
+        - {$ref: '#/components/parameters/DatasetRef'}
+      responses:
+        '200':
+          description: Dataset metadata and resources
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/CatalogDataset'}
+        default: {$ref: '#/components/responses/Error'}
+  /catalog/resources/{resource_ref}/preflight:
+    post:
+      tags: [Catalog]
+      summary: Safely assess importability of one specific distribution
+      parameters:
+        - {$ref: '#/components/parameters/ResourceRef'}
+      responses:
+        '200':
+          description: Importability status
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Importability'}
+        default: {$ref: '#/components/responses/Error'}
+  /imports:
+    post:
+      tags: [Imports]
+      summary: Queue an in-app dataset import
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/ImportRequest'}
+      responses:
+        '202':
+          description: Import job queued
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ImportJob'}
+        default: {$ref: '#/components/responses/Error'}
+  /imports/{job_id}:
+    get:
+      tags: [Imports]
+      parameters:
+        - {$ref: '#/components/parameters/JobId'}
+      responses:
+        '200':
+          description: Import job status
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ImportJob'}
+        default: {$ref: '#/components/responses/Error'}
+  /imports/{job_id}/cancel:
+    post:
+      tags: [Imports]
+      parameters:
+        - {$ref: '#/components/parameters/JobId'}
+      responses:
+        '202': {description: Best-effort cancellation requested}
+        default: {$ref: '#/components/responses/Error'}
+  /datasets:
+    get:
+      tags: [Datasets]
+      summary: List authorized imported dataset versions
+      responses:
+        '200':
+          description: Dataset list
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: '#/components/schemas/ImportedDataset'}
+        default: {$ref: '#/components/responses/Error'}
+  /datasets/{dataset_id}:
+    get:
+      tags: [Datasets]
+      parameters:
+        - {$ref: '#/components/parameters/DatasetId'}
+      responses:
+        '200':
+          description: Dataset schema and provenance
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ImportedDataset'}
+        default: {$ref: '#/components/responses/Error'}
+  /datasets/{dataset_id}/attach:
+    post:
+      tags: [Datasets]
+      parameters:
+        - {$ref: '#/components/parameters/DatasetId'}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [notebook_id]
+              properties:
+                notebook_id: {type: string}
+      responses:
+        '200': {description: Dataset attached to authorized notebook}
+        default: {$ref: '#/components/responses/Error'}
+  /mcp/servers:
+    get:
+      tags: [MCP]
+      summary: Admin or authorized user's sanitized MCP registry listing
+      responses:
+        '200':
+          description: MCP server status without credentials
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: '#/components/schemas/MCPServer'}
+        default: {$ref: '#/components/responses/Error'}
+    post:
+      tags: [MCP]
+      summary: Admin-only registration of approved MCP endpoint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [alias, backend, endpoint_ref]
+              properties:
+                alias: {type: string}
+                backend: {type: string, enum: [dbhub, duckdb, google_toolbox]}
+                endpoint_ref: {type: string, description: Reference to server-side approved configuration, not arbitrary URL}
+      responses:
+        '201':
+          description: Server registered pending test/approval
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/MCPServer'}
+        default: {$ref: '#/components/responses/Error'}
+  /mcp/servers/{server_id}/test:
+    post:
+      tags: [MCP]
+      parameters:
+        - {$ref: '#/components/parameters/ServerId'}
+      responses:
+        '200':
+          description: Sanitized connection health
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok]
+                properties:
+                  ok: {type: boolean}
+                  message: {type: string}
+                  tested_at: {type: string, format: date-time}
+        default: {$ref: '#/components/responses/Error'}
+  /mcp/servers/{server_id}/discover:
+    post:
+      tags: [MCP]
+      parameters:
+        - {$ref: '#/components/parameters/ServerId'}
+      responses:
+        '200': {description: Sanitized discovered capabilities, requiring administrative approval}
+        default: {$ref: '#/components/responses/Error'}
+  /query/plans:
+    post:
+      tags: [Research]
+      summary: Generate a safe unexecuted SQL plan within a notebook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [notebook_id, question]
+              properties:
+                notebook_id: {type: string}
+                question: {type: string, maxLength: 10000}
+                connection_id: {type: [string, 'null']}
+      responses:
+        '200':
+          description: Plan to review/approve
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/QueryPlan'}
+        default: {$ref: '#/components/responses/Error'}
+  /query/plans/{plan_id}/execute:
+    post:
+      tags: [Research]
+      parameters:
+        - {$ref: '#/components/parameters/PlanId'}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [approve]
+              properties:
+                approve: {type: boolean}
+                approval_token: {type: [string, 'null'], description: Short-lived server-issued approval token if configured}
+      responses:
+        '200':
+          description: Query result and evidence reference
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [evidence_id, result_row_count]
+                properties:
+                  evidence_id: {type: string}
+                  result_row_count: {type: integer, minimum: 0}
+                  result_preview: {type: array, items: {type: object}}
+        default: {$ref: '#/components/responses/Error'}
+  /evidence/{evidence_id}:
+    get:
+      tags: [Research]
+      parameters:
+        - {$ref: '#/components/parameters/EvidenceId'}
+      responses:
+        '200':
+          description: Access-controlled query lineage and bounded snapshot
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Evidence'}
+        default: {$ref: '#/components/responses/Error'}
+  /usage:
+    get:
+      tags: [Usage]
+      parameters:
+        - name: range
+          in: query
+          schema: {type: string, enum: [session, today, 7d, all], default: session}
+        - {name: notebook_id, in: query, schema: {type: string}}
+        - {name: model, in: query, schema: {type: string}}
+      responses:
+        '200':
+          description: Aggregated LiteLLM-backed usage; price status explicit
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Usage'}
+        default: {$ref: '#/components/responses/Error'}
+  /health:
+    get:
+      tags: [Usage]
+      summary: Restricted aggregated health status (no credential details)
+      responses:
+        '200':
+          description: Health summary
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: {type: string, enum: [ok, degraded, unavailable]}
+                  services: {type: object, additionalProperties: {type: string}}
+components:
+  securitySchemes:
+    AppSession:
+      type: apiKey
+      in: cookie
+      name: session # Illustrative: adapt to actual Open Notebook authn mechanisms.
+  parameters:
+    DatasetRef:
+      {name: dataset_ref, in: path, required: true, schema: {type: string}}
+    ResourceRef:
+      {name: resource_ref, in: path, required: true, schema: {type: string}}
+    DatasetId:
+      {name: dataset_id, in: path, required: true, schema: {type: string}}
+    JobId:
+      {name: job_id, in: path, required: true, schema: {type: string}}
+    ServerId:
+      {name: server_id, in: path, required: true, schema: {type: string}}
+    PlanId:
+      {name: plan_id, in: path, required: true, schema: {type: string}}
+    EvidenceId:
+      {name: evidence_id, in: path, required: true, schema: {type: string}}
+  responses:
+    Error:
+      description: Typed safe error response
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/Error'}
+  schemas:
+    Error:
+      type: object
+      required: [code, message, correlation_id, retryable]
+      properties:
+        code: {type: string}
+        message: {type: string}
+        correlation_id: {type: string}
+        retryable: {type: boolean}
+    Importability:
+      type: object
+      required: [status, reason]
+      properties:
+        status: {type: string, enum: [checking, ready, connector_required, unavailable]}
+        reason: {type: string}
+        adapter: {type: [string, 'null']}
+        format: {type: [string, 'null']}
+        estimated_bytes: {type: [integer, 'null'], minimum: 0}
+        checked_at: {type: [string, 'null'], format: date-time}
+    CatalogCard:
+      type: object
+      required: [dataset_ref, title, publisher]
+      properties:
+        dataset_ref: {type: string}
+        title: {type: string}
+        publisher: {type: string}
+        description: {type: [string, 'null']}
+        source_url: {type: [string, 'null'], format: uri}
+        dataset_modified_at: {type: [string, 'null']}
+        last_harvested_at: {type: [string, 'null']}
+    CatalogDataset:
+      allOf:
+        - {$ref: '#/components/schemas/CatalogCard'}
+        - type: object
+          required: [resources]
+          properties:
+            rights: {type: [string, 'null']}
+            resources:
+              type: array
+              items:
+                type: object
+                required: [resource_ref, format, importability]
+                properties:
+                  resource_ref: {type: string}
+                  title: {type: [string, 'null']}
+                  format: {type: string}
+                  importability: {$ref: '#/components/schemas/Importability'}
+    ImportRequest:
+      type: object
+      required: [resource_ref, notebook_id, idempotency_key]
+      properties:
+        resource_ref: {type: string}
+        notebook_id: {type: string}
+        idempotency_key: {type: string, minLength: 8}
+        options: {type: object, additionalProperties: true}
+    ImportJob:
+      type: object
+      required: [job_id, stage, status, resource_ref]
+      properties:
+        job_id: {type: string}
+        stage: {type: string, enum: [queued, resolving, downloading, validating, parsing, staging, profiling, publishing, registering, ready, failed, cancelled]}
+        status: {type: string, enum: [pending, running, ready, failed, cancelled]}
+        resource_ref: {type: string}
+        progress_percent: {type: [number, 'null'], minimum: 0, maximum: 100}
+        downloaded_bytes: {type: integer, minimum: 0}
+        imported_rows: {type: integer, minimum: 0}
+        dataset_id: {type: [string, 'null']}
+        dataset_version_id: {type: [string, 'null']}
+        error: {anyOf: [{$ref: '#/components/schemas/Error'}, {type: 'null'}]}
+    ImportedDataset:
+      type: object
+      required: [dataset_id, version_id, name, row_count, source_url, imported_at]
+      properties:
+        dataset_id: {type: string}
+        version_id: {type: string}
+        name: {type: string}
+        row_count: {type: integer, minimum: 0}
+        source_url: {type: string, format: uri}
+        imported_at: {type: string, format: date-time}
+        checksum_sha256: {type: string}
+        columns:
+          type: array
+          items:
+            type: object
+            required: [name, type]
+            properties:
+              name: {type: string}
+              type: {type: string}
+              nullable: {type: boolean}
+    MCPServer:
+      type: object
+      required: [server_id, alias, backend, enabled, health]
+      properties:
+        server_id: {type: string}
+        alias: {type: string}
+        backend: {type: string, enum: [dbhub, duckdb, google_toolbox]}
+        enabled: {type: boolean}
+        health: {type: string, enum: [healthy, degraded, unknown, unavailable]}
+        last_tested_at: {type: [string, 'null'], format: date-time}
+    QueryPlan:
+      type: object
+      required: [plan_id, sql, dialect, connection_id, requires_approval, policy_status]
+      properties:
+        plan_id: {type: string}
+        sql: {type: string}
+        dialect: {type: string}
+        connection_id: {type: string}
+        requires_approval: {type: boolean}
+        policy_status: {type: string, enum: [pending, allowed, denied]}
+        warnings: {type: array, items: {type: string}}
+    Evidence:
+      type: object
+      required: [evidence_id, query_run_id, sql, executed_at, result_row_count, source_versions]
+      properties:
+        evidence_id: {type: string}
+        query_run_id: {type: string}
+        sql: {type: string}
+        executed_at: {type: string, format: date-time}
+        result_row_count: {type: integer, minimum: 0}
+        result_sha256: {type: string}
+        source_versions: {type: array, items: {type: string}}
+        result_preview: {type: array, items: {type: object}}
+        warnings: {type: array, items: {type: string}}
+    Usage:
+      type: object
+      required: [request_count, input_tokens, output_tokens, pricing_status]
+      properties:
+        request_count: {type: integer, minimum: 0}
+        input_tokens: {type: integer, minimum: 0}
+        output_tokens: {type: integer, minimum: 0}
+        cached_input_tokens: {type: [integer, 'null'], minimum: 0}
+        estimated_cost_usd: {type: [number, 'null'], minimum: 0}
+        pricing_status: {type: string, enum: [priced, estimated, unpriced, mixed]}
+        model_breakdown: {type: array, items: {type: object}}

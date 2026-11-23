@@ -1,0 +1,23 @@
+flowchart TB
+    User[Analyst / Administrator] --> Web[Next.js UI]
+    Web --> Api[Open Notebook FastAPI]
+    Api --> Graph[LangGraph Research Agent]
+    Graph --> Esperanto[Upstream Esperanto Provider Registry]
+    Esperanto --> Lite[LiteLLM Proxy]
+    Lite --> Provider[OpenAI-compatible LLM Endpoint]
+    Lite --> Pg[(PostgreSQL: usage + spend)]
+    Graph --> Policy[SQL Review, Approval, MCP Policy]
+    Policy --> Registry[MCP Client Registry]
+    Registry --> DBHub[DBHub]
+    Registry --> Toolbox[Google MCP Toolbox]
+    Registry --> DuckMCP[DuckDB MCP Read-only]
+    DBHub --> Enterprise[(SQL Server / PostgreSQL / MySQL / MariaDB / SQLite / Oracle)]
+    Toolbox --> Extra[(Curated cloud / analytics DBs)]
+    DuckMCP --> Duck[(Versioned local DuckDB)]
+    Api --> Explorer[Open Data Explorer]
+    Explorer --> Catalog[Data.gov v4 API]
+    Explorer --> Jobs[Existing Open Notebook Worker]
+    Jobs --> Pub[Approved publisher download / Census / NOAA adapters]
+    Pub --> Duck
+    Api --> Surreal[(SurrealDB: notebooks, source metadata, evidence)]
+    Graph --> Surreal

@@ -1,0 +1,3 @@
+agency_id,service_area_id,census_geography_id,noaa_station_id,join_verified,notes
+DEMO-A1,DEMO-UZA-A,DEMO-UZA-A,DEMO-ST-A,true,Synthetic verified one-to-one geography mapping for test only
+DEMO-A2,DEMO-UZA-B,DEMO-UZA-B,DEMO-ST-B,false,Synthetic unverified service area mapping; per-capita should be withheld

@@ -1,0 +1,198 @@
+{
+  "package": "Open Notebook DataBridge \u2014 Codex Design Package",
+  "version": "1.0",
+  "prepared_date": "2026-10-29",
+  "status": "DESIGN-ONLY / NOT-IMPLEMENTED",
+  "files": [
+    {
+      "path": "CODEX_START_HERE.md",
+      "size_bytes": 6252,
+      "sha256": "e6bd29f19dcb26983b6fbc749f0aaf63379988d2dabb928f6e9ae7a11a8afd83"
+    },
+    {
+      "path": "EXECUTIVE_DESIGN_BRIEF.md",
+      "size_bytes": 6317,
+      "sha256": "0f1a658b354afd8faf088e1de256421dcc512c1e3aceffea3d5c510225c2e81c"
+    },
+    {
+      "path": "README.md",
+      "size_bytes": 6078,
+      "sha256": "811c2c343963de9f4604708b78efae8cf4da17538376519f836559d2c066e515"
+    },
+    {
+      "path": "assets/DataBridge_Approved_Architecture_Infographic.png",
+      "size_bytes": 1968268,
+      "sha256": "364c0d27312ee7fcf39375091e385803793ec20d68c21d412f615a328d1bc922"
+    },
+    {
+      "path": "assets/DataBridge_Full_Tech_Stack_Infographic.png",
+      "size_bytes": 1957931,
+      "sha256": "adaa6527dbd6e1f77910d89c34b92f40ee59f16fd338f9b1180334171c9f0c9e"
+    },
+    {
+      "path": "assets/README.md",
+      "size_bytes": 864,
+      "sha256": "fcf29bc984475379220f92045121b33bb7197b23d4bc8fa3961cd102f151ed30"
+    },
+    {
+      "path": "config/.env.example",
+      "size_bytes": 2626,
+      "sha256": "4bb6cabc2f1b980fbc6a7f2962cbf09f35c2b4b0293e212c8f239288e5443683"
+    },
+    {
+      "path": "config/compose-extension.reference.yaml",
+      "size_bytes": 2067,
+      "sha256": "67587d6a5f662c6d79f5e90d501c33f7811fffe376bf4a5fd3b2e879d0a16967"
+    },
+    {
+      "path": "config/litellm-config.template.yaml",
+      "size_bytes": 689,
+      "sha256": "82a0995cf7c3ec6a814079caed3df14711631852b725431b5b49240c3f972c21"
+    },
+    {
+      "path": "config/render_litellm_config.py",
+      "size_bytes": 1183,
+      "sha256": "0767824c62cae00582730b1305d00c7a47df91c5872e679b2fd9662779bf11a2"
+    },
+    {
+      "path": "diagrams/architecture.mmd",
+      "size_bytes": 1078,
+      "sha256": "f30ae8c923ac66d841f9bd25ae3a99c5643af1ba67cdf19cbc67aa98148fab99"
+    },
+    {
+      "path": "diagrams/ingestion_sequence.mmd",
+      "size_bytes": 1264,
+      "sha256": "92ebb6b0a8d26b7ad877785c253557f57c9a8843c60f860f1d037695f53cda23"
+    },
+    {
+      "path": "docs/01_PRODUCT_SCOPE.md",
+      "size_bytes": 4588,
+      "sha256": "a0c8a17b6bfe459b0542901f06c113265254124c25f5c2c06f4d3767c588bbb7"
+    },
+    {
+      "path": "docs/02_ARCHITECTURE.md",
+      "size_bytes": 5587,
+      "sha256": "ab518e18ca72cb9225b5a6ceb443f0fe8fa4911370efc2b34b121ea503152fe8"
+    },
+    {
+      "path": "docs/03_REQUIREMENTS.md",
+      "size_bytes": 8141,
+      "sha256": "b051e1385eddd06b669aaf458f9f40d1828d5226be161af5ffc52ee80d4daaa7"
+    },
+    {
+      "path": "docs/04_OPEN_DATA_INGESTION.md",
+      "size_bytes": 8159,
+      "sha256": "9b66eb5dde21ca6076598943c3a0e7fcf492575ac0a00ec67959aeaabb0a5552"
+    },
+    {
+      "path": "docs/05_MCP_DATABASE_INTEGRATION.md",
+      "size_bytes": 6837,
+      "sha256": "e58f09b1764cc3fcd86358fa3422d09e1930193d3b0d9c4a5a3064b6d592337a"
+    },
+    {
+      "path": "docs/06_LLM_LITELLM_COSTS.md",
+      "size_bytes": 5663,
+      "sha256": "0086dd2159500d59a2e8aa3cfc42d6c2987f572e06ab647a5abe3a0752d2ee07"
+    },
+    {
+      "path": "docs/07_SECURITY.md",
+      "size_bytes": 6044,
+      "sha256": "fac3e0ef10da96cb8518f7c6703daaadfb05a35689168ee5354a56c605ae092e"
+    },
+    {
+      "path": "docs/08_UI_AND_API.md",
+      "size_bytes": 5341,
+      "sha256": "7c9731165966ab3e7946616eaf456cc3c8a578baa63ce05d997ab296bc365afb"
+    },
+    {
+      "path": "docs/09_PROVENANCE_DATA_MODEL.md",
+      "size_bytes": 5036,
+      "sha256": "a8e324271b0a6d03bdf99108a6c527cb46278aa00d680023b0587ea9c50d65d9"
+    },
+    {
+      "path": "docs/10_DOT_DEMO.md",
+      "size_bytes": 5579,
+      "sha256": "239efa48d27f285c7f49dd51bb08fb24bb563fb93fb202dd0fb4273422be9b56"
+    },
+    {
+      "path": "docs/11_TEST_PLAN.md",
+      "size_bytes": 5007,
+      "sha256": "cf4714e06450f7f609509c8519f16f087d3bb7c976d55752d2f182cb2132467a"
+    },
+    {
+      "path": "docs/12_ROADMAP.md",
+      "size_bytes": 5145,
+      "sha256": "69912bf6845a956c68c3ee0b2534d3eb36148475ba2a119711c6a9aa6b12199d"
+    },
+    {
+      "path": "docs/13_ADRS_AND_QUESTIONS.md",
+      "size_bytes": 4748,
+      "sha256": "9befd81e8bc607a3e03f12ba544daa884bd399831bdee41a2b413605a2ef2392"
+    },
+    {
+      "path": "docs/14_REFERENCES.md",
+      "size_bytes": 3946,
+      "sha256": "436a7b0d1f5569a0782ab919c08b154e3a5c0cbb1a37ab5aceeade1c6f0a7cea"
+    },
+    {
+      "path": "fixtures/README.md",
+      "size_bytes": 1676,
+      "sha256": "2fe1e7f286837fd8729f61caa0fce89e2edbec2969ebd63662c54a4809b82a16"
+    },
+    {
+      "path": "fixtures/census_synthetic.csv",
+      "size_bytes": 344,
+      "sha256": "d2142eb68f0f95d25c33450d3b7f33579dddbeb4c5408327e535f5b14d3c1138"
+    },
+    {
+      "path": "fixtures/geography_crosswalk_synthetic.csv",
+      "size_bytes": 308,
+      "sha256": "e6b5ed2c45de4ff4ab5034d60c3ad66c54fe710a9858c8163d95b502d79c6601"
+    },
+    {
+      "path": "fixtures/noaa_synthetic.csv",
+      "size_bytes": 384,
+      "sha256": "3719c0c1aabf9621aeaff71c800466bf2f1ac362dc1869fea01aaa3ff0e9a620"
+    },
+    {
+      "path": "fixtures/ntd_synthetic.csv",
+      "size_bytes": 717,
+      "sha256": "d9e9f088bf8815d5996561ceee7efd694d3ebcc687ed39c4eb9d100d052f2281"
+    },
+    {
+      "path": "spec/openapi.yaml",
+      "size_bytes": 16617,
+      "sha256": "51a8b9248bec0ebc444ce6762b373696393e1d30beccbe68193cb557ddcaaff2"
+    },
+    {
+      "path": "spec/schemas/dataset-import-request.schema.json",
+      "size_bytes": 531,
+      "sha256": "fcab1c5408da9760746c6c264a30ce509e4b28b3221f93e9edff5f8471bdd5de"
+    },
+    {
+      "path": "spec/schemas/importability.schema.json",
+      "size_bytes": 792,
+      "sha256": "263174b13cf2b7eadad28ee920971ee36832aff14f3fa500794c6524a333e491"
+    },
+    {
+      "path": "spec/schemas/query-evidence.schema.json",
+      "size_bytes": 944,
+      "sha256": "8de0442676a8f7cfbc2089812508cfe7738b9f23155d4391446229aa07ef0c14"
+    },
+    {
+      "path": "spec/schemas/usage-summary.schema.json",
+      "size_bytes": 930,
+      "sha256": "5fbfbdc884e3a86133b954f1096b0a995ece05dcb13747f2adfdc21e142070f4"
+    },
+    {
+      "path": "tests/test_fixture_baseline.py",
+      "size_bytes": 2409,
+      "sha256": "64b5be17309703713f64404ae5f96fbfd09b7253119e2a777b84c558c1aaac0f"
+    },
+    {
+      "path": "tools/validate_package.py",
+      "size_bytes": 3881,
+      "sha256": "0f7795c5ed41965e6ff597a0fd8837de7df1f3bf0d0a3d0134b0de9d0979d314"
+    }
+  ]
+}

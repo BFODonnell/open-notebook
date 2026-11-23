@@ -1,0 +1,13 @@
+agency_id,agency_name,year,mode,unlinked_passenger_trips,service_area_id
+DEMO-A1,Synthetic Metro A,2022,Bus,1000000,DEMO-UZA-A
+DEMO-A1,Synthetic Metro A,2023,Bus,1100000,DEMO-UZA-A
+DEMO-A1,Synthetic Metro A,2024,Bus,1200000,DEMO-UZA-A
+DEMO-A1,Synthetic Metro A,2025,Bus,1250000,DEMO-UZA-A
+DEMO-A1,Synthetic Metro A,2022,Rail,500000,DEMO-UZA-A
+DEMO-A1,Synthetic Metro A,2023,Rail,550000,DEMO-UZA-A
+DEMO-A1,Synthetic Metro A,2024,Rail,600000,DEMO-UZA-A
+DEMO-A1,Synthetic Metro A,2025,Rail,650000,DEMO-UZA-A
+DEMO-A2,Synthetic Metro B,2022,Bus,600000,DEMO-UZA-B
+DEMO-A2,Synthetic Metro B,2023,Bus,650000,DEMO-UZA-B
+DEMO-A2,Synthetic Metro B,2024,Bus,710000,DEMO-UZA-B
+DEMO-A2,Synthetic Metro B,2025,Bus,800000,DEMO-UZA-B

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DataBridge ImportRequest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "resource_ref",
+    "notebook_id",
+    "idempotency_key"
+  ],
+  "properties": {
+    "resource_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "notebook_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "idempotency_key": {
+      "type": "string",
+      "minLength": 8
+    },
+    "options": {
+      "type": "object"
+    }
+  }
+}

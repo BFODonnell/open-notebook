@@ -1,0 +1,51 @@
+# ARCHITECTURE REFERENCE, NOT A DROP-IN OVERRIDE.
+# Codex: reconcile service names and networks against actual upstream Docker Compose;
+# pin exact image tags/digests; verify commands/health checks and secret injection.
+# The snippet illustrates persistent LiteLLM spend storage; MCP services require
+# separately verified pinned images and approved configuration, so they are not
+# fabricated here.
+services:
+  litellm-postgres:
+    image: postgres:17-alpine # Pin digest in implemented deployment.
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${LITELLM_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${LITELLM_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${LITELLM_POSTGRES_DB}
+    volumes:
+      - databridge_litellm_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [databridge_internal]
+
+  litellm:
+    image: ${LITELLM_IMAGE:?Supply_verified_pinned_LiteLLM_image}
+    restart: unless-stopped
+    depends_on:
+      litellm-postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${LITELLM_POSTGRES_USER}:${LITELLM_POSTGRES_PASSWORD}@litellm-postgres:5432/${LITELLM_POSTGRES_DB}
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY}
+      LITELLM_SALT_KEY: ${LITELLM_SALT_KEY}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      OPENAI_API_BASE: ${OPENAI_API_BASE}
+      LLM_MODEL: ${LLM_MODEL:-gpt-6-astra}
+      LLM_PROVIDER_MODEL: ${LLM_PROVIDER_MODEL:-openai/gpt-6-astra}
+    volumes:
+      - ./databridge-config/litellm-config.yaml:/app/config.yaml:ro
+    command: ["--config", "/app/config.yaml", "--port", "4000"] # Verify image entrypoint.
+    networks: [databridge_internal, databridge_egress]
+    # Do not expose external port in real deployment unless explicitly authorized.
+
+networks:
+  databridge_internal:
+    internal: true
+  databridge_egress:
+    driver: bridge # Enforce external destination policy at egress/firewall/proxy layer.
+
+volumes:
+  databridge_litellm_pg:

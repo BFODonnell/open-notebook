@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DataBridge QueryEvidence",
+  "type": "object",
+  "required": [
+    "evidence_id",
+    "query_run_id",
+    "sql",
+    "executed_at",
+    "result_row_count",
+    "source_versions"
+  ],
+  "properties": {
+    "evidence_id": {
+      "type": "string"
+    },
+    "query_run_id": {
+      "type": "string"
+    },
+    "sql": {
+      "type": "string"
+    },
+    "executed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "result_row_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "source_versions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "result_sha256": {
+      "type": "string"
+    },
+    "result_preview": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

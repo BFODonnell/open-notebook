@@ -1,0 +1,16 @@
+# Template for LiteLLM Proxy. Render ${LLM_MODEL} using the provided helper or a
+# compatible startup step; do not mount this unrendered file into LiteLLM.
+# Other values are resolved by LiteLLM from server environment at runtime.
+model_list:
+  - model_name: ${LLM_MODEL}
+    litellm_params:
+      model: os.environ/LLM_PROVIDER_MODEL
+      api_base: os.environ/OPENAI_API_BASE
+      api_key: os.environ/OPENAI_API_KEY
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
+  database_url: os.environ/DATABASE_URL
+
+# Add budgets, retention, tagged callbacks and health settings only after verifying
+# the exact pinned LiteLLM Proxy version and its documented configuration schema.

@@ -1,0 +1,32 @@
+sequenceDiagram
+    actor Analyst
+    participant UI as Open Data Explorer
+    participant API as FastAPI
+    participant D as Data.gov v4 API
+    participant W as Import Worker
+    participant P as Publisher
+    participant DB as DuckDB
+    participant M as MCP Query Broker
+    participant N as Notebook Chat
+    Analyst->>UI: Search "NTD annual service"
+    UI->>API: GET /catalog/search
+    API->>D: GET /search (X-Api-Key)
+    D-->>API: dcat distribution, next `after` cursor
+    API-->>UI: Dataset cards
+    Analyst->>UI: Open dataset and preview resource
+    UI->>API: POST /resources/{id}/preflight
+    API-->>UI: Ready / Connector Required / Unavailable
+    Analyst->>UI: Click Import (choose notebook)
+    UI->>API: POST /imports
+    API->>W: Queue import job
+    W->>P: Safe HTTPS download (allowlist + limits)
+    P-->>W: Bytes / records
+    W->>DB: Stage, profile, publish immutable version
+    W->>M: Register approved local read-only dataset alias
+    M-->>W: Test SELECT OK
+    W->>N: Attach schema + provenance to active notebook
+    W-->>UI: Ready + dataset version
+    Analyst->>N: Ask a question in same chat
+    N->>M: Reviewed, bounded query through MCP
+    M-->>N: Result + provenance
+    N-->>Analyst: Chart + executed SQL + cited evidence
