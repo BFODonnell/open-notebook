@@ -18,7 +18,7 @@ from urllib.parse import parse_qsl, urljoin, urlsplit, urlunsplit
 import httpx
 
 MAX_DOWNLOAD = 32 * 1024 * 1024
-DEFAULT_HOSTS = "data.transportation.gov,transit.dot.gov,www.transit.dot.gov"
+DEFAULT_HOSTS = "data.transportation.gov,transit.dot.gov,www.transit.dot.gov,www2.census.gov,www.ncei.noaa.gov"
 
 
 class AcquisitionError(ValueError):
@@ -54,7 +54,7 @@ def validate_public_url(url: str, allowed: set[str]):
         ):
             raise ValueError()
         if not parsed.hostname or parsed.hostname.lower() not in allowed:
-            raise ValueError()
+            raise AcquisitionError("HOST_POLICY_REJECTED")
         if any(
             k.lower()
             in {
@@ -72,8 +72,10 @@ def validate_public_url(url: str, allowed: set[str]):
         ):
             raise ValueError()
         return parsed
+    except AcquisitionError:
+        raise
     except (ValueError, TypeError):
-        raise AcquisitionError("DOWNLOAD_BLOCKED") from None
+        raise AcquisitionError("URL_POLICY_REJECTED") from None
 
 
 async def resolve(host: str) -> list[str]:
@@ -104,7 +106,7 @@ async def pinned_target(url: str, allowed: set[str]) -> tuple[str, dict, dict]:
     try:
         addresses = await asyncio.wait_for(resolve(parsed.hostname), 5)
         if not addresses or any(not public_ip(a) for a in addresses):
-            raise AcquisitionError("DOWNLOAD_BLOCKED")
+            raise AcquisitionError("ADDRESS_POLICY_REJECTED")
     except AcquisitionError:
         raise
     except Exception:
@@ -155,7 +157,7 @@ async def fetch(
                     target, headers, extensions = await pinned_target(url, allowed)
                     if api_key:
                         if urlsplit(url).hostname != initial_host:
-                            raise AcquisitionError("DOWNLOAD_BLOCKED")
+                            raise AcquisitionError("CREDENTIAL_REDIRECT_BLOCKED")
                         headers["X-Api-Key"] = api_key
                     async with client.stream(
                         "GET", target, headers=headers, extensions=extensions
@@ -167,8 +169,10 @@ async def fetch(
                             continue
                         if response.status_code == 429:
                             raise AcquisitionError("RATE_LIMITED", True)
-                        if response.status_code in {401, 403}:
+                        if response.status_code == 401:
                             raise AcquisitionError("SOURCE_AUTH_REQUIRED")
+                        if response.status_code == 403:
+                            raise AcquisitionError("SOURCE_ACCESS_DENIED")
                         if response.status_code != 200:
                             raise AcquisitionError(
                                 "SOURCE_UNAVAILABLE", response.status_code >= 500
@@ -203,6 +207,8 @@ async def fetch(
                         )
     except AcquisitionError:
         raise
-    except (httpx.HTTPError, TimeoutError, OSError):
+    except (httpx.TimeoutException, TimeoutError):
+        raise AcquisitionError("TRANSFER_TIMEOUT", True) from None
+    except (httpx.HTTPError, OSError):
         raise AcquisitionError("TRANSFER_FAILED", True) from None
     raise AcquisitionError("SOURCE_UNAVAILABLE")

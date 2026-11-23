@@ -164,7 +164,7 @@ async def main(mode):
             )
             for title, reason in [
                 ("HTML masquerade", "FORMAT_MISMATCH"),
-                ("Blocked redirect", "DOWNLOAD_BLOCKED"),
+                ("Blocked redirect", "HOST_POLICY_REJECTED"),
                 ("Oversize transfer", "TRANSFER_LIMIT"),
             ]:
                 result = await api(

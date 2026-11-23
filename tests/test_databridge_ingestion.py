@@ -59,7 +59,7 @@ async def test_mixed_dns_answer_fails_closed(monkeypatch):
         return ["93.184.216.34", "127.0.0.1"]
 
     monkeypatch.setattr(download, "resolve", resolve)
-    with pytest.raises(download.AcquisitionError, match="DOWNLOAD_BLOCKED"):
+    with pytest.raises(download.AcquisitionError, match="ADDRESS_POLICY_REJECTED"):
         await download.pinned_target(
             "https://data.transportation.gov/file.csv", {"data.transportation.gov"}
         )
@@ -125,7 +125,7 @@ async def test_redirect_revalidated_before_connect(monkeypatch, tmp_path, locati
         return httpx.Response(302, headers={"location": location}, stream=Bytes(b""))
 
     transport(monkeypatch, handler)
-    with pytest.raises(download.AcquisitionError, match="DOWNLOAD_BLOCKED"):
+    with pytest.raises(download.AcquisitionError, match="URL_POLICY_REJECTED|HOST_POLICY_REJECTED"):
         await download.fetch("https://data.transportation.gov/a.csv", tmp_path / "file")
     assert len(requests) == 1
 
@@ -135,7 +135,7 @@ async def test_redirect_revalidated_before_connect(monkeypatch, tmp_path, locati
     [
         (429, {}, b"", "RATE_LIMITED"),
         (404, {}, b"", "SOURCE_UNAVAILABLE"),
-        (403, {}, b"", "SOURCE_AUTH_REQUIRED"),
+        (403, {}, b"", "SOURCE_ACCESS_DENIED"),
         (200, {"content-length": "100"}, b"a", "TRANSFER_LIMIT"),
         (200, {}, b"a" * 33, "TRANSFER_LIMIT"),
         (200, {"content-encoding": "gzip"}, b"x", "HTTP_COMPRESSION_BLOCKED"),
@@ -162,7 +162,7 @@ async def test_transfer_failure_limits(
         ({"accessLevel": "non-public"}, "unavailable"),
         ({"accessLevel": "restricted public"}, "unavailable"),
         ({"accessLevel": "public", "rights": "permission required"}, "unavailable"),
-        ({"accessLevel": "public"}, "checking"),
+        ({"accessLevel": "public"}, "unavailable"),
         ({}, "unavailable"),
     ],
 )
@@ -174,14 +174,15 @@ def test_rights_are_not_inferred_from_public_catalog(metadata, status):
     assert catalog.classify(metadata, resource)["status"] == status
 
 
-def test_excel_api_and_ambiguous_formats_require_adapters():
+def test_api_and_ambiguous_formats_require_adapters():
     for resource in [
-        {"accessURL": "https://data.transportation.gov/api"},
-        {"downloadURL": "https://data.transportation.gov/file.xlsx", "format": "XLSX"},
+        {"accessURL": "https://data.transportation.gov/api.xml"},
         {"downloadURL": "https://data.transportation.gov/file.csv", "format": "JSON"},
     ]:
         assert (
-            catalog.classify({"accessLevel": "public"}, resource)["status"]
+            catalog.classify({"accessLevel": "public", "rights": "CC0 1.0"}, resource)[
+                "status"
+            ]
             == "connector_required"
         )
 
@@ -321,7 +322,7 @@ async def test_redirect_dns_rebinding_rejected(monkeypatch, tmp_path):
         return next(answers)
 
     monkeypatch.setattr(download, "resolve", resolve)
-    with pytest.raises(download.AcquisitionError, match="DOWNLOAD_BLOCKED"):
+    with pytest.raises(download.AcquisitionError, match="ADDRESS_POLICY_REJECTED"):
         await download.fetch("https://data.transportation.gov/a.csv", tmp_path / "data")
     assert len(calls) == 1
 
@@ -339,7 +340,7 @@ async def test_catalog_key_cannot_follow_cross_host_redirect(monkeypatch, tmp_pa
         )
 
     transport(monkeypatch, handler)
-    with pytest.raises(download.AcquisitionError, match="DOWNLOAD_BLOCKED"):
+    with pytest.raises(download.AcquisitionError, match="CREDENTIAL_REDIRECT_BLOCKED"):
         await download.fetch(
             "https://api.gsa.gov/search",
             tmp_path / "data",
@@ -352,7 +353,11 @@ async def test_catalog_key_cannot_follow_cross_host_redirect(monkeypatch, tmp_pa
 @pytest.mark.parametrize("rights", ["public", ["public"], None, ""])
 def test_official_dot_public_rights_declaration(rights):
     result = catalog.classify(
-        {"accessLevel": "public", "rights": rights},
+        {
+            "accessLevel": "public",
+            "rights": rights,
+            "license": "https://www.usa.gov/government-works",
+        },
         {
             "mediaType": "text/csv",
             "downloadURL": "https://data.transportation.gov/api/v3/views/wwdp-t4re/export.csv?accessType=DOWNLOAD",

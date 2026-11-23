@@ -152,9 +152,9 @@ export function AppSidebar() {
             </div>
           ) : (
             <>
-              <div className="flex items-center gap-2.5">
-                <LogoPebbles />
-                <span className="font-display text-[15px] font-bold tracking-tight text-sidebar-foreground">
+              <div className="flex min-w-0 items-center gap-2.5">
+                <LogoPebbles className="shrink-0" />
+                <span className="font-display text-[15px] font-bold leading-tight tracking-tight text-sidebar-foreground">
                   {t('common.appName')}
                 </span>
               </div>

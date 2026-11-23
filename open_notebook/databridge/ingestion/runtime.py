@@ -58,7 +58,9 @@ async def workspace():
             fcntl.flock(lock, fcntl.LOCK_UN)
 
 
-async def parse(source: Path, database: Path, adapter: str) -> dict:
+async def parse(
+    source: Path, database: Path, adapter: str, sheet: str | None = None
+) -> dict:
     # No application secrets, proxy variables, or caller-provided command/SQL.
     env = {
         "PATH": os.defpath,
@@ -75,6 +77,7 @@ async def parse(source: Path, database: Path, adapter: str) -> dict:
         str(source),
         str(database),
         adapter,
+        *([sheet] if sheet is not None else []),
         env=env,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.DEVNULL,

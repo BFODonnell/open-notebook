@@ -4,8 +4,24 @@ import { ReactNode } from 'react'
 import { expect, it, vi } from 'vitest'
 import { useImports } from './use-databridge-catalog'
 import { QUERY_KEYS } from '@/lib/api/query-client'
+import { catalogApi } from '@/lib/api/databridge-catalog'
 
 vi.mock('@/lib/api/databridge-catalog', () => ({ catalogApi: { imports: vi.fn().mockResolvedValue([{ id: 'job', version_id: 'version', status: 'running' }]) } }))
+
+it('fetches imports with the selected notebook ID and keeps notebook caches separate', async () => {
+  vi.mocked(catalogApi.imports).mockClear()
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+  const wrapper = ({ children }: { children: ReactNode }) => <QueryClientProvider client={client}>{children}</QueryClientProvider>
+  const { rerender, unmount } = renderHook(({ notebook }) => useImports(notebook), { wrapper, initialProps: { notebook: '' } })
+  expect(catalogApi.imports).not.toHaveBeenCalled()
+  rerender({ notebook: 'notebook:demo' })
+  await waitFor(() => expect(catalogApi.imports).toHaveBeenCalledWith('notebook:demo'))
+  rerender({ notebook: 'notebook:other' })
+  await waitFor(() => expect(catalogApi.imports).toHaveBeenCalledWith('notebook:other'))
+  expect(client.getQueryData([...QUERY_KEYS.databridgeCatalog, 'imports', 'notebook:demo'])).toBeDefined()
+  unmount()
+  client.clear()
+})
 
 it('refreshes notebook sources and MCP connections only after worker completion', async () => {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })

@@ -2,7 +2,7 @@
 
 Retain the [Phase 1](../README.md) and [Phase 2](../mcp/README.md) configurations.
 Use Linux Docker containers and `uv sync --extra databridge` for Python dependencies.
-No new Python package or MCP server is required for ingestion.
+The DataBridge extra includes openpyxl/defusedxml for bounded XLSX parsing; no new MCP server is required.
 
 ## Enable
 
@@ -77,10 +77,24 @@ CSV must be UTF-8, rectangular, comma-delimited with headers. JSON must be a fla
 array of consistent objects (or JSON Lines); duplicate keys and nested structures
 are rejected. Parquet must contain supported scalar columns. ZIP directories are
 permitted, but links, traversal, encrypted/nested/multiple data files are rejected.
-XLSX, XML, API-only and authenticated resources remain adapter-required/unavailable.
-Unknown rights require review; there is no browser bypass. Raw files are temporary;
+HTML resources support one-page discovery of up to 30 approved download links
+within a 2 MiB page. Select a file before preview; multiple XLSX worksheets also
+require selection. XLSX needs unique text headers in the first row and inert
+values: formulas, error cells, macros and external workbook links are unsupported.
+Its container is limited to 200 entries, 20 sheets, 64 MiB expanded and 100:1 ratio.
+XML, API-only and authenticated resources remain adapter-required/unavailable.
+Explicit CC0/public-domain or government-work licensing is required; public access
+or a bare rights=public declaration alone is insufficient. Unknown/conflicting
+rights require review; there is no browser bypass. HTTP 403 reports publisher
+access denial (`SOURCE_ACCESS_DENIED`), not rights review. Raw files are temporary;
 download and archive-member checksums remain in provenance. Empty CSV fields become
 NULL and conservative inference may keep mixed numeric values as text.
+
+Import opens a confirmation dialog naming the destination notebook. An accepted
+request shows its job ID and processing status. Retrying the same file bytes and
+worksheet in the same notebook reuses the existing job, including failed jobs;
+use its explicit Retry action to recover. Landing-page and final download URLs
+are retained alongside catalog metadata and checksums.
 
 Cancellation takes effect at safe checkpoints before publication. A cancelled
 download may finish its bounded transfer before stopping. Once publication begins,

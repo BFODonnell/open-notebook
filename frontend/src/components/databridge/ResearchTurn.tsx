@@ -37,7 +37,11 @@ export function ResearchTurn({ id, notebookId, sessionId }: { id: string; notebo
   const canReview = !!turn.plan && ['awaiting_review', 'awaiting_approval', 'failed'].includes(turn.state)
   const canResume = ['answer_failed', 'evidence_ready', 'executing', 'synthesizing'].includes(turn.state)
   const max = Math.max(1, ...(turn.chart?.points.map(p => Math.abs(Number(p.value))) || []))
-  return <section className="space-y-3 rounded border p-3 text-sm" aria-label={t('research.title')}>
+  const resultRows = turn.state === 'completed' ? turn.evidence?.rows || [] : []
+  const resultColumns = [...new Set(resultRows.flatMap(row => Object.keys(row)))]
+  // Put the period first without changing the verified query's values.
+  resultColumns.sort((a, b) => Number(b === 'report_year' || b === 'year') - Number(a === 'report_year' || a === 'year'))
+  return <section className="min-w-0 space-y-3 rounded border p-3 text-sm" aria-label={t('research.title')}>
     <p className="font-semibold">{t('research.title')}</p>
     <p>{turn.question}</p>
     <p role="status">{t('research.status')}: <code>{turn.state}</code></p>
@@ -48,6 +52,13 @@ export function ResearchTurn({ id, notebookId, sessionId }: { id: string; notebo
     {approval && turn.state === 'awaiting_approval' && approval.plan_id === turn.plan?.id && <Button disabled={action.isPending || (turn.plan?.expires_at || '') < new Date().toISOString()} onClick={() => action.mutate('execute')}>{t('research.approve')}</Button>}
     {canResume && <Button variant="outline" disabled={action.isPending} onClick={() => action.mutate('resume')}>{t('research.resume')}</Button>}
     {action.isError && <p role="alert" className="text-destructive">{t('research.error')}</p>}
+    {!!resultRows.length && <div className="max-h-96 overflow-auto rounded border">
+      <table className="w-full text-left text-xs" aria-label={t('research.resultTable')}>
+        <caption className="p-2 text-left font-semibold">{t('research.resultTable')}</caption>
+        <thead><tr>{resultColumns.map(column => <th key={column} scope="col" className="whitespace-nowrap border-b p-2">{column.replaceAll('_', ' ')}</th>)}</tr></thead>
+        <tbody>{resultRows.map((row, index) => <tr key={index}>{resultColumns.map(column => <td key={column} className="whitespace-nowrap border-b p-2">{row[column] == null ? t('research.nullValue') : String(row[column])}</td>)}</tr>)}</tbody>
+      </table>
+    </div>}
     {['completed', 'answer_failed', 'failed', 'blocked'].includes(turn.state) && <p className="whitespace-pre-wrap">{turn.answer}</p>}
     {turn.chart && <figure aria-label={t('research.trend')} className="space-y-2">
       <figcaption>{t('research.trend')}: {turn.chart.value_column}</figcaption>

@@ -90,10 +90,109 @@ def unique_object(pairs: list[tuple]) -> dict:
     return result
 
 
-def stage(source: Path, database: Path, kind: str) -> dict:
+def spreadsheet(source: Path, sheet: str | None) -> tuple[Path | None, dict]:
+    """Read OOXML as inert values inside the existing resource-limited process."""
+    from defusedxml.ElementTree import fromstring
+    from openpyxl import load_workbook
+
+    with zipfile.ZipFile(source) as archive:
+        files = archive.infolist()
+        if not 1 <= len(files) <= 200 or len({f.filename for f in files}) != len(files):
+            raise ValueError("WORKBOOK_LIMIT")
+        expanded = 0
+        for info in files:
+            path = PurePosixPath(info.filename)
+            if (
+                path.is_absolute()
+                or ".." in path.parts
+                or "\\" in info.filename
+                or ":" in info.filename
+                or info.flag_bits & 1
+                or stat.S_ISLNK(info.external_attr >> 16)
+            ):
+                raise ValueError("UNSAFE_ARCHIVE")
+            expanded += info.file_size
+            if (
+                expanded > MAX_EXPANDED
+                or info.file_size > max(1, info.compress_size) * 100
+            ):
+                raise ValueError("WORKBOOK_LIMIT")
+            if (
+                "vbaproject" in info.filename.lower()
+                or "externallinks/" in info.filename.lower()
+            ):
+                raise ValueError("WORKBOOK_ACTIVE_CONTENT_UNSUPPORTED")
+            if info.filename.endswith(".rels"):
+                relationships = fromstring(archive.read(info))
+                if any(
+                    r.get("TargetMode") == "External"
+                    and not r.get("Type", "").endswith("/hyperlink")
+                    for r in relationships
+                ):
+                    raise ValueError("WORKBOOK_ACTIVE_CONTENT_UNSUPPORTED")
+    # A binary stream avoids trusting the filename extension. No macros,
+    # external links, formula evaluation or network access are enabled.
+    with source.open("rb") as stream:
+        book = load_workbook(stream, read_only=True, data_only=False, keep_links=False)
+        try:
+            names = book.sheetnames
+            if not 1 <= len(names) <= 20:
+                raise ValueError("WORKBOOK_LIMIT")
+            if sheet is None and len(names) > 1:
+                return None, {"sheets": names}
+            selected = sheet or names[0]
+            if selected not in names:
+                raise ValueError("WORKSHEET_SELECTION_REQUIRED")
+            worksheet = book[selected]
+            if (worksheet.max_row or 0) > MAX_ROWS + 1 or (
+                worksheet.max_column or 0
+            ) > MAX_COLUMNS:
+                raise ValueError("ROW_OR_STRUCTURE_LIMIT")
+            converted = source.parent / "workbook.csv"
+            with converted.open("x", encoding="utf-8", newline="") as output:
+                writer = csv.writer(output)
+                width = None
+                for index, row in enumerate(worksheet.iter_rows()):
+                    if index > MAX_ROWS or len(row) > MAX_COLUMNS:
+                        raise ValueError("ROW_OR_STRUCTURE_LIMIT")
+                    if any(cell.data_type in {"f", "e"} for cell in row):
+                        raise ValueError("WORKBOOK_FORMULA_OR_ERROR_UNSUPPORTED")
+                    values = [cell.value for cell in row]
+                    if index == 0:
+                        while values and values[-1] is None:
+                            values.pop()
+                        if not values or any(
+                            not isinstance(v, str) or not v.strip() for v in values
+                        ):
+                            raise ValueError("WORKBOOK_HEADER_REQUIRED")
+                        width = len(values)
+                    if width is not None and any(v is not None for v in values[width:]):
+                        raise ValueError("ROW_OR_STRUCTURE_LIMIT")
+                    values = values[:width]
+                    # Preserve explicit zero-padding in numeric identifiers.
+                    for i, cell in enumerate(row[: len(values)]):
+                        if isinstance(values[i], int) and re.fullmatch(
+                            r"0{2,}", cell.number_format
+                        ):
+                            values[i] = str(values[i]).zfill(len(cell.number_format))
+                    writer.writerow(values)
+                    if output.tell() > MAX_EXPANDED:
+                        raise ValueError("WORKBOOK_LIMIT")
+            return converted, {"sheet": selected}
+        finally:
+            book.close()
+
+
+def stage(source: Path, database: Path, kind: str, sheet: str | None = None) -> dict:
     import duckdb
 
     archive = None
+    workbook = None
+    if kind == "xlsx":
+        converted, workbook = spreadsheet(source, sheet)
+        if converted is None:
+            return workbook
+        source, kind = converted, "csv"
     if kind == "zip":
         source, kind, archive = unpack(source)
     with source.open("rb") as stream:
@@ -285,6 +384,7 @@ def stage(source: Path, database: Path, kind: str) -> dict:
         "profile": profile,
         "preview": preview,
         "archive": archive,
+        "workbook": workbook,
         "warnings": [
             "Identifier columns remain text; numeric inference is conservative. Review publisher units and geography before comparison."
         ],
@@ -317,7 +417,12 @@ def main():
     resource.setrlimit(resource.RLIMIT_CPU, (45, 45))
     resource.setrlimit(resource.RLIMIT_NOFILE, (64, 64))
     try:
-        result = stage(Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3])
+        result = stage(
+            Path(sys.argv[1]),
+            Path(sys.argv[2]),
+            sys.argv[3],
+            sys.argv[4] if len(sys.argv) > 4 else None,
+        )
         print(json.dumps(result, allow_nan=False))
     except Exception as error:
         code = (

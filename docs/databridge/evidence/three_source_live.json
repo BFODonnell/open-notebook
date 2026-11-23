@@ -1,0 +1,1237 @@
+{
+  "verified_at_local": "2026-11-22",
+  "notebook_id": "notebook:4mzyg2ostswv0un7d2gc",
+  "notebook_name": "Transit Population Weather - Verified Live Demo",
+  "sources": [
+    {
+      "title": "Massachusetts transit, population and Boston Logan weather — annual context",
+      "job_id": "db_import:e4fca7c71376e53bc9eb359a200b88d3ea37eb7d",
+      "version_id": "e1473981-740f-474e-ac2a-641fb50b2264",
+      "rows": 4,
+      "columns": [
+        {
+          "column": "c_1_missing_trips",
+          "original": "missing_trips",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_2_questionable_trips",
+          "original": "questionable_trips",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_3_records",
+          "original": "records",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_4_report_year",
+          "original": "report_year",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_5_reported_trips",
+          "original": "reported_trips",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_6_state_fips",
+          "original": "state_fips",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_7_population_july1",
+          "original": "population_july1",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_8_population_vintage",
+          "original": "population_vintage",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_9_trips_per_resident_context",
+          "original": "trips_per_resident_context",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_10_logan_tavg_c",
+          "original": "logan_tavg_c",
+          "type": "DECIMAL(24,6)"
+        },
+        {
+          "column": "c_11_logan_prcp_mm",
+          "original": "logan_prcp_mm",
+          "type": "DECIMAL(24,6)"
+        },
+        {
+          "column": "c_12_weather_station",
+          "original": "weather_station",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_13_tavg_source_flag",
+          "original": "tavg_source_flag",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_14_prcp_measurement_source_flags",
+          "original": "prcp_measurement_source_flags",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_15_weather_annual_record_available",
+          "original": "weather_annual_record_available",
+          "type": "VARCHAR"
+        }
+      ],
+      "download": {
+        "bytes": 611,
+        "content_type": "text/csv",
+        "final_url": "analysis:e4fca7c71376e53bc9eb359a200b88d3ea37eb7d",
+        "retrieved_at": "2026-11-23T01:57:44.897188+00:00",
+        "sha256": "350ea91fd0e50a495fca92e9c52535be282795b41294ef0913fc8aeca3e9c9b7"
+      },
+      "provenance": {
+        "contract": {
+          "geography": "NTD agency State MA maps to Census STATE 25, SUMLEV 040. Logan USW00014739 is a coastal Boston station, not a statewide weather estimate or an agency service-area exposure.",
+          "grain": "Only Annual Total NTD rows. Require unique year/NTD ID/mode/type-of-service keys; sum once per year before attaching one population and one station record. UPT counts boardings, not unique people. Agency-headquarters state does not imply all trips occurred in that state.",
+          "join": "One row per report year, left join annual population and station by year; reject duplicate keys; absent years remain NULL. Never repeat population across transit rows.",
+          "missing": "TRY_CAST comma-stripped UPT; retain missing and questionable counts. Per-resident ratio withheld if any UPT is missing/questionable. Weather NULLs stay missing; flagged precipitation withheld. Annual source/measurement flags do not certify daily completeness.",
+          "time": "2022–2025 year labels: NTD annual agency report year (fiscal periods may differ), Census July 1 resident population (Vintage 2025), NOAA calendar-year summary. Descriptive contextual comparison only; no exact temporal exposure match or causal inference.",
+          "version": "ma-logan-annual-v1"
+        },
+        "sources": {
+          "population": "dc0d489d-bfa0-471d-ad52-aeff0c5cf198",
+          "transit": "54b66fa6-f5ac-40d7-84d9-2cb288ebd5ba",
+          "weather": "32e5f499-ae76-470b-9b98-1b820aa3c5aa"
+        },
+        "reviewed_queries": [
+          {
+            "name": "transit",
+            "role": "transit",
+            "sql": "SELECT \"c_7_report_year\" AS \"report_year\", COUNT(*) AS \"records\", SUM(TRY_CAST(REPLACE(\"c_51_unlinked_passenger_trips__upt\", ',', '') AS BIGINT)) AS \"reported_trips\", SUM(CASE WHEN TRY_CAST(REPLACE(\"c_51_unlinked_passenger_trips__upt\", ',', '') AS BIGINT) IS NULL THEN 1 ELSE 0 END) AS \"missing_trips\", SUM(CASE WHEN COALESCE(\"c_52_unlinked_passenger_trips_questionable\", '') <> '' THEN 1 ELSE 0 END) AS \"questionable_trips\" FROM \"data\" WHERE \"c_3_state\" = 'MA' AND \"c_20_time_period\" = 'Annual Total' AND \"c_7_report_year\" BETWEEN 2022 AND 2025 GROUP BY \"c_7_report_year\" ORDER BY \"c_7_report_year\" LIMIT 100"
+          },
+          {
+            "name": "grain_2022",
+            "role": "transit",
+            "sql": "SELECT \"c_4_ntd_id\", \"c_9_mode\", \"c_11_type_of_service\", COUNT(*) AS \"records\" FROM \"data\" WHERE \"c_3_state\" = 'MA' AND \"c_20_time_period\" = 'Annual Total' AND \"c_7_report_year\" BETWEEN 2022 AND 2025 AND \"c_7_report_year\" = 2022 GROUP BY \"c_4_ntd_id\", \"c_9_mode\", \"c_11_type_of_service\" LIMIT 100"
+          },
+          {
+            "name": "grain_2023",
+            "role": "transit",
+            "sql": "SELECT \"c_4_ntd_id\", \"c_9_mode\", \"c_11_type_of_service\", COUNT(*) AS \"records\" FROM \"data\" WHERE \"c_3_state\" = 'MA' AND \"c_20_time_period\" = 'Annual Total' AND \"c_7_report_year\" BETWEEN 2022 AND 2025 AND \"c_7_report_year\" = 2023 GROUP BY \"c_4_ntd_id\", \"c_9_mode\", \"c_11_type_of_service\" LIMIT 100"
+          },
+          {
+            "name": "grain_2024",
+            "role": "transit",
+            "sql": "SELECT \"c_4_ntd_id\", \"c_9_mode\", \"c_11_type_of_service\", COUNT(*) AS \"records\" FROM \"data\" WHERE \"c_3_state\" = 'MA' AND \"c_20_time_period\" = 'Annual Total' AND \"c_7_report_year\" BETWEEN 2022 AND 2025 AND \"c_7_report_year\" = 2024 GROUP BY \"c_4_ntd_id\", \"c_9_mode\", \"c_11_type_of_service\" LIMIT 100"
+          },
+          {
+            "name": "grain_2025",
+            "role": "transit",
+            "sql": "SELECT \"c_4_ntd_id\", \"c_9_mode\", \"c_11_type_of_service\", COUNT(*) AS \"records\" FROM \"data\" WHERE \"c_3_state\" = 'MA' AND \"c_20_time_period\" = 'Annual Total' AND \"c_7_report_year\" BETWEEN 2022 AND 2025 AND \"c_7_report_year\" = 2025 GROUP BY \"c_4_ntd_id\", \"c_9_mode\", \"c_11_type_of_service\" LIMIT 100"
+          },
+          {
+            "name": "population",
+            "role": "population",
+            "sql": "SELECT \"c_9_popestimate2022\" AS \"pop_2022\", \"c_10_popestimate2023\" AS \"pop_2023\", \"c_11_popestimate2024\" AS \"pop_2024\", \"c_12_popestimate2025\" AS \"pop_2025\" FROM \"data\" WHERE \"c_1_sumlev\" = '040' AND \"c_4_state\" = '25' LIMIT 100"
+          },
+          {
+            "name": "weather",
+            "role": "weather",
+            "sql": "SELECT \"c_1_station\" AS \"station\", \"c_6_date\" AS \"report_year\", \"c_9_tavg\" AS \"tavg\", \"c_7_prcp\" AS \"prcp\", \"c_10_tavg_attributes\" AS \"tavg_flags\", \"c_8_prcp_attributes\" AS \"prcp_flags\" FROM \"data\" WHERE \"c_1_station\" = 'USW00014739' AND \"c_6_date\" BETWEEN 2022 AND 2025 ORDER BY \"c_6_date\" LIMIT 100"
+          }
+        ]
+      }
+    },
+    {
+      "title": "NOAA GSOY — Boston Logan, 2022–2025",
+      "job_id": "db_import:b977b31793a7fc9a6306309ab34661309bcd7c6c",
+      "version_id": "32e5f499-ae76-470b-9b98-1b820aa3c5aa",
+      "rows": 4,
+      "columns": [
+        {
+          "column": "c_1_station",
+          "original": "STATION",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_2_name",
+          "original": "NAME",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_3_latitude",
+          "original": "LATITUDE",
+          "type": "DECIMAL(24,6)"
+        },
+        {
+          "column": "c_4_longitude",
+          "original": "LONGITUDE",
+          "type": "DECIMAL(24,6)"
+        },
+        {
+          "column": "c_5_elevation",
+          "original": "ELEVATION",
+          "type": "DECIMAL(24,6)"
+        },
+        {
+          "column": "c_6_date",
+          "original": "DATE",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_7_prcp",
+          "original": "PRCP",
+          "type": "DECIMAL(24,6)"
+        },
+        {
+          "column": "c_8_prcp_attributes",
+          "original": "PRCP_ATTRIBUTES",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_9_tavg",
+          "original": "TAVG",
+          "type": "DECIMAL(24,6)"
+        },
+        {
+          "column": "c_10_tavg_attributes",
+          "original": "TAVG_ATTRIBUTES",
+          "type": "VARCHAR"
+        }
+      ],
+      "download": {
+        "bytes": 587,
+        "content_type": "text/csv",
+        "final_url": "https://www.ncei.noaa.gov/access/services/data/v1?dataset=global-summary-of-the-year&startDate=2022-01-01&endDate=2025-12-31&stations=USW00014739&dataTypes=TAVG%2CPRCP&format=csv&units=metric&includeAttributes=true&includeStationName=true&includeStationLocation=true",
+        "retrieved_at": "2026-11-23T01:54:05.224709+00:00",
+        "sha256": "14fdd02d308f3ee746aaa8f4aa89c3e878083fa18e7b0ffc2173cb17e8bea94c"
+      },
+      "provenance": {
+        "catalog_url": "https://www.ncei.noaa.gov/metadata/geoportal/rest/metadata/item/gov.noaa.ncdc%3AC00947/xml",
+        "resource_url": "https://www.ncei.noaa.gov/access/services/data/v1?dataset=global-summary-of-the-year&startDate=2022-01-01&endDate=2025-12-31&stations=USW00014739&dataTypes=TAVG%2CPRCP&format=csv&units=metric&includeAttributes=true&includeStationName=true&includeStationLocation=true",
+        "resolved_download_url": "https://www.ncei.noaa.gov/access/services/data/v1?dataset=global-summary-of-the-year&startDate=2022-01-01&endDate=2025-12-31&stations=USW00014739&dataTypes=TAVG%2CPRCP&format=csv&units=metric&includeAttributes=true&includeStationName=true&includeStationLocation=true"
+      }
+    },
+    {
+      "title": "Census Vintage 2025 — State population estimates, 2020–2025",
+      "job_id": "db_import:8725d906803804fbba0d625495cfb5aa1c72efa3",
+      "version_id": "dc0d489d-bfa0-471d-ad52-aeff0c5cf198",
+      "rows": 66,
+      "columns": [
+        {
+          "column": "c_1_sumlev",
+          "original": "SUMLEV",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_2_region",
+          "original": "REGION",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_3_division",
+          "original": "DIVISION",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_4_state",
+          "original": "STATE",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_5_name",
+          "original": "NAME",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_6_estimatesbase2020",
+          "original": "ESTIMATESBASE2020",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_7_popestimate2020",
+          "original": "POPESTIMATE2020",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_8_popestimate2021",
+          "original": "POPESTIMATE2021",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_9_popestimate2022",
+          "original": "POPESTIMATE2022",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_10_popestimate2023",
+          "original": "POPESTIMATE2023",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_11_popestimate2024",
+          "original": "POPESTIMATE2024",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_12_popestimate2025",
+          "original": "POPESTIMATE2025",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_13_npopchg_2020",
+          "original": "NPOPCHG_2020",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_14_npopchg_2021",
+          "original": "NPOPCHG_2021",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_15_npopchg_2022",
+          "original": "NPOPCHG_2022",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_16_npopchg_2023",
+          "original": "NPOPCHG_2023",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_17_npopchg_2024",
+          "original": "NPOPCHG_2024",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_18_npopchg_2025",
+          "original": "NPOPCHG_2025",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_19_births2020",
+          "original": "BIRTHS2020",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_20_births2021",
+          "original": "BIRTHS2021",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_21_births2022",
+          "original": "BIRTHS2022",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_22_births2023",
+          "original": "BIRTHS2023",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_23_births2024",
+          "original": "BIRTHS2024",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_24_births2025",
+          "original": "BIRTHS2025",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_25_deaths2020",
+          "original": "DEATHS2020",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_26_deaths2021",
+          "original": "DEATHS2021",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_27_deaths2022",
+          "original": "DEATHS2022",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_28_deaths2023",
+          "original": "DEATHS2023",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_29_deaths2024",
+          "original": "DEATHS2024",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_30_deaths2025",
+          "original": "DEATHS2025",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_31_naturalchg2020",
+          "original": "NATURALCHG2020",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_32_naturalchg2021",
+          "original": "NATURALCHG2021",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_33_naturalchg2022",
+          "original": "NATURALCHG2022",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_34_naturalchg2023",
+          "original": "NATURALCHG2023",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_35_naturalchg2024",
+          "original": "NATURALCHG2024",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_36_naturalchg2025",
+          "original": "NATURALCHG2025",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_37_internationalmig2020",
+          "original": "INTERNATIONALMIG2020",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_38_internationalmig2021",
+          "original": "INTERNATIONALMIG2021",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_39_internationalmig2022",
+          "original": "INTERNATIONALMIG2022",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_40_internationalmig2023",
+          "original": "INTERNATIONALMIG2023",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_41_internationalmig2024",
+          "original": "INTERNATIONALMIG2024",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_42_internationalmig2025",
+          "original": "INTERNATIONALMIG2025",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_43_domesticmig2020",
+          "original": "DOMESTICMIG2020",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_44_domesticmig2021",
+          "original": "DOMESTICMIG2021",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_45_domesticmig2022",
+          "original": "DOMESTICMIG2022",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_46_domesticmig2023",
+          "original": "DOMESTICMIG2023",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_47_domesticmig2024",
+          "original": "DOMESTICMIG2024",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_48_domesticmig2025",
+          "original": "DOMESTICMIG2025",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_49_netmig2020",
+          "original": "NETMIG2020",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_50_netmig2021",
+          "original": "NETMIG2021",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_51_netmig2022",
+          "original": "NETMIG2022",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_52_netmig2023",
+          "original": "NETMIG2023",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_53_netmig2024",
+          "original": "NETMIG2024",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_54_netmig2025",
+          "original": "NETMIG2025",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_55_residual2020",
+          "original": "RESIDUAL2020",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_56_residual2021",
+          "original": "RESIDUAL2021",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_57_residual2022",
+          "original": "RESIDUAL2022",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_58_residual2023",
+          "original": "RESIDUAL2023",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_59_residual2024",
+          "original": "RESIDUAL2024",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_60_residual2025",
+          "original": "RESIDUAL2025",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_61_gqestimatesbase2020",
+          "original": "GQESTIMATESBASE2020",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_62_gqestimates2020",
+          "original": "GQESTIMATES2020",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_63_gqestimates2021",
+          "original": "GQESTIMATES2021",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_64_gqestimates2022",
+          "original": "GQESTIMATES2022",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_65_gqestimates2023",
+          "original": "GQESTIMATES2023",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_66_gqestimates2024",
+          "original": "GQESTIMATES2024",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_67_gqestimates2025",
+          "original": "GQESTIMATES2025",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_68_rbirth2021",
+          "original": "RBIRTH2021",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_69_rbirth2022",
+          "original": "RBIRTH2022",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_70_rbirth2023",
+          "original": "RBIRTH2023",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_71_rbirth2024",
+          "original": "RBIRTH2024",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_72_rbirth2025",
+          "original": "RBIRTH2025",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_73_rdeath2021",
+          "original": "RDEATH2021",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_74_rdeath2022",
+          "original": "RDEATH2022",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_75_rdeath2023",
+          "original": "RDEATH2023",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_76_rdeath2024",
+          "original": "RDEATH2024",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_77_rdeath2025",
+          "original": "RDEATH2025",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_78_rnaturalchg2021",
+          "original": "RNATURALCHG2021",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_79_rnaturalchg2022",
+          "original": "RNATURALCHG2022",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_80_rnaturalchg2023",
+          "original": "RNATURALCHG2023",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_81_rnaturalchg2024",
+          "original": "RNATURALCHG2024",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_82_rnaturalchg2025",
+          "original": "RNATURALCHG2025",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_83_rinternationalmig2021",
+          "original": "RINTERNATIONALMIG2021",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_84_rinternationalmig2022",
+          "original": "RINTERNATIONALMIG2022",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_85_rinternationalmig2023",
+          "original": "RINTERNATIONALMIG2023",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_86_rinternationalmig2024",
+          "original": "RINTERNATIONALMIG2024",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_87_rinternationalmig2025",
+          "original": "RINTERNATIONALMIG2025",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_88_rdomesticmig2021",
+          "original": "RDOMESTICMIG2021",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_89_rdomesticmig2022",
+          "original": "RDOMESTICMIG2022",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_90_rdomesticmig2023",
+          "original": "RDOMESTICMIG2023",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_91_rdomesticmig2024",
+          "original": "RDOMESTICMIG2024",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_92_rdomesticmig2025",
+          "original": "RDOMESTICMIG2025",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_93_rnetmig2021",
+          "original": "RNETMIG2021",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_94_rnetmig2022",
+          "original": "RNETMIG2022",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_95_rnetmig2023",
+          "original": "RNETMIG2023",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_96_rnetmig2024",
+          "original": "RNETMIG2024",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_97_rnetmig2025",
+          "original": "RNETMIG2025",
+          "type": "VARCHAR"
+        }
+      ],
+      "download": {
+        "bytes": 53555,
+        "content_type": "text/csv",
+        "final_url": "https://www2.census.gov/programs-surveys/popest/datasets/2020-2025/state/totals/NST-EST2025-ALLDATA.csv",
+        "last_modified": "Tue, 27 Jan 2026 13:45:29 GMT",
+        "retrieved_at": "2026-11-23T01:51:30.067417+00:00",
+        "sha256": "92188e29cb0a67dcf95afa7d6c47359409782f086478b70ea4128eb70e223ca9"
+      },
+      "provenance": {
+        "catalog_url": "https://www.census.gov/data/tables/time-series/demo/popest/2020s-state-total.html",
+        "resource_url": "https://www2.census.gov/programs-surveys/popest/datasets/2020-2025/state/totals/NST-EST2025-ALLDATA.csv",
+        "resolved_download_url": "https://www2.census.gov/programs-surveys/popest/datasets/2020-2025/state/totals/NST-EST2025-ALLDATA.csv"
+      }
+    },
+    {
+      "title": "2022 - 2025 NTD Annual Data - Service (by Mode and Time Period)",
+      "job_id": "db_import:f4a20ddb4e6d118bab420005ecdb9c7a9dee145c",
+      "version_id": "54b66fa6-f5ac-40d7-84d9-2cb288ebd5ba",
+      "rows": 51716,
+      "columns": [
+        {
+          "column": "c_1_agency",
+          "original": "Agency",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_2_city",
+          "original": "City",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_3_state",
+          "original": "State",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_4_ntd_id",
+          "original": "NTD ID",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_5_organization_type",
+          "original": "Organization Type",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_6_reporter_type",
+          "original": "Reporter Type",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_7_report_year",
+          "original": "Report Year",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_8_agency_voms",
+          "original": "Agency VOMS",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_9_mode",
+          "original": "Mode",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_10_mode_name",
+          "original": "Mode Name",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_11_type_of_service",
+          "original": "Type Of Service",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_12_mode_voms",
+          "original": "Mode VOMS",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_13_mode_voms_questionable",
+          "original": "Mode VOMS Questionable",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_14_uace_code",
+          "original": "UACE Code",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_15_uza_name",
+          "original": "UZA Name",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_16_uza_area_sq_miles",
+          "original": "UZA Area Sq Miles",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_17_uza_population",
+          "original": "UZA Population",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_18_service_area_sq_miles",
+          "original": "Service Area Sq Miles",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_19_service_area_population",
+          "original": "Service Area Population",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_20_time_period",
+          "original": "Time Period",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_21_time_service_begins",
+          "original": "Time Service Begins",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_22_time_service_ends",
+          "original": "Time Service Ends",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_23_actual_vehicle_passenger_car_miles",
+          "original": "Actual Vehicle/Passenger Car Miles",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_24_vehicle_miles_questionable",
+          "original": "Vehicle Miles Questionable",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_25_actual_vehicle_passenger_car_revenue_miles",
+          "original": "Actual Vehicle/Passenger Car Revenue Miles",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_26_vehicle_revenue_miles_questionable",
+          "original": "Vehicle Revenue Miles Questionable",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_27_actual_vehicle__passenger_deadhead_miles",
+          "original": "Actual Vehicle/ Passenger Deadhead Miles",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_28_deadhead_miles_questionable",
+          "original": "Deadhead Miles Questionable",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_29_scheduled_vehicle_passenger_car_revenue_miles",
+          "original": "Scheduled Vehicle/Passenger Car Revenue Miles",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_30_scheduled_revenue_miles_questionable",
+          "original": "Scheduled Revenue Miles Questionable",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_31_actual_vehicles__passenger_car_hours",
+          "original": "Actual Vehicles/ Passenger Car Hours",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_32_vehicle_hours_questionable",
+          "original": "Vehicle Hours Questionable",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_33_actual_vehicle_passenger_car_revenue_hours",
+          "original": "Actual Vehicle/Passenger Car Revenue Hours",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_34_vehicle_revenue_hours_questionable",
+          "original": "Vehicle Revenue Hours Questionable",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_35_actual_vehicle_passenger_car_deadhead_hours",
+          "original": "Actual Vehicle/Passenger Car Deadhead Hours",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_36_deadhead_hours_questionable",
+          "original": "Deadhead Hours Questionable",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_37_charter_service_hours",
+          "original": "Charter Service Hours",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_38_school_bus_hours",
+          "original": "School Bus Hours",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_39_trains_in_operation",
+          "original": "Trains In Operation",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_40_trains_in_operation_questionable",
+          "original": "Trains in Operation Questionable",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_41_train_miles",
+          "original": "Train Miles",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_42_train_miles_questionable",
+          "original": "Train Miles Questionable",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_43_train_revenue_miles",
+          "original": "Train Revenue Miles",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_44_train_revenue_miles_questionable",
+          "original": "Train Revenue Miles Questionable",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_45_train_deadhead_miles",
+          "original": "Train Deadhead Miles",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_46_train_hours",
+          "original": "Train Hours",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_47_train_hours_questionable",
+          "original": "Train Hours Questionable",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_48_train_revenue_hours",
+          "original": "Train Revenue Hours",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_49_train_revenue_hours_questionable",
+          "original": "Train Revenue Hours Questionable",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_50_train_deadhead_hours",
+          "original": "Train Deadhead Hours",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_51_unlinked_passenger_trips__upt",
+          "original": "Unlinked Passenger Trips (UPT)",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_52_unlinked_passenger_trips_questionable",
+          "original": "Unlinked Passenger Trips Questionable",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_53_ada_upt",
+          "original": "ADA UPT",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_54_sponsored_service_upt",
+          "original": "Sponsored Service UPT",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_55_passenger_miles_traveled",
+          "original": "Passenger Miles Traveled",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_56_passenger_miles_questionable",
+          "original": "Passenger Miles Questionable",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_57_directional_route_miles",
+          "original": "Directional Route Miles",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_58_directional_route_miles_questionable",
+          "original": "Directional Route Miles Questionable",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_59_brt_non_statutory_mixed_traffic_miles",
+          "original": "BRT Non-Statutory Mixed Traffic Miles",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_60_mixed_traffic_right_of_way_miles",
+          "original": "Mixed Traffic Right-of-Way Miles",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_61_days_of_service_operated",
+          "original": "Days Of Service Operated",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_62_days_not_operated___strikes",
+          "original": "Days Not Operated - Strikes",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_63_days_not_operated___emergencies",
+          "original": "Days Not Operated - Emergencies",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_64_average_revenue_speed",
+          "original": "Average Revenue Speed",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_65_average_revenue_speed_questionable",
+          "original": "Average Revenue Speed Questionable",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_66_average_passenger_trip_length__aptl",
+          "original": "Average Passenger Trip Length (APTL)",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_67_aptl_questionable",
+          "original": "APTL Questionable",
+          "type": "VARCHAR"
+        },
+        {
+          "column": "c_68_passengers_per_vehicle_revenue_hour",
+          "original": "Passengers per Vehicle Revenue Hour",
+          "type": "BIGINT"
+        },
+        {
+          "column": "c_69_passengers_per_hour_questionable",
+          "original": "Passengers per Hour Questionable",
+          "type": "VARCHAR"
+        }
+      ],
+      "download": {
+        "bytes": 19944739,
+        "content_type": "text/csv",
+        "etag": "W/\"2iMgP8CQtFvQgI5ihAcR5qmayYcjSlhTe-Rvi9i3Crc--gzip\"",
+        "final_url": "https://data.transportation.gov/api/v3/views/wwdp-t4re/export.csv?accessType=DOWNLOAD",
+        "last_modified": "Mon, 23 Nov 2026 01:49:49 GMT",
+        "retrieved_at": "2026-11-23T01:49:54.231737+00:00",
+        "sha256": "2c1125521334445af061e59bc0646e7273a5d236989f2b3d329a4606ae98dadb"
+      },
+      "provenance": {
+        "catalog_url": "https://data.transportation.gov/api/views/wwdp-t4re",
+        "resource_url": "https://data.transportation.gov/api/v3/views/wwdp-t4re/export.csv?accessType=DOWNLOAD",
+        "resolved_download_url": "https://data.transportation.gov/api/v3/views/wwdp-t4re/export.csv?accessType=DOWNLOAD"
+      }
+    }
+  ],
+  "comparison_rows": [
+    {
+      "logan_prcp_mm": "794.900000",
+      "logan_tavg_c": "12.000000",
+      "missing_trips": 0,
+      "population_july1": 7025465,
+      "population_vintage": 2025,
+      "prcp_measurement_source_flags": " ,W",
+      "questionable_trips": 3,
+      "records": 55,
+      "report_year": 2022,
+      "reported_trips": 227309167,
+      "state_fips": "25",
+      "tavg_source_flag": "W",
+      "weather_annual_record_available": "True",
+      "weather_station": "USW00014739"
+    },
+    {
+      "logan_prcp_mm": "1264.600000",
+      "logan_tavg_c": "12.200000",
+      "missing_trips": 0,
+      "population_july1": 7073479,
+      "population_vintage": 2025,
+      "prcp_measurement_source_flags": " ,W",
+      "questionable_trips": 2,
+      "records": 53,
+      "report_year": 2023,
+      "reported_trips": 262844430,
+      "state_fips": "25",
+      "tavg_source_flag": "W",
+      "weather_annual_record_available": "True",
+      "weather_station": "USW00014739"
+    },
+    {
+      "logan_prcp_mm": "1153.300000",
+      "logan_tavg_c": "12.100000",
+      "missing_trips": 0,
+      "population_july1": 7138560,
+      "population_vintage": 2025,
+      "prcp_measurement_source_flags": " ,W",
+      "questionable_trips": 2,
+      "records": 53,
+      "report_year": 2024,
+      "reported_trips": 284112207,
+      "state_fips": "25",
+      "tavg_source_flag": "W",
+      "weather_annual_record_available": "True",
+      "weather_station": "USW00014739"
+    },
+    {
+      "logan_prcp_mm": "943.600000",
+      "logan_tavg_c": "11.200000",
+      "missing_trips": 0,
+      "population_july1": 7154084,
+      "population_vintage": 2025,
+      "prcp_measurement_source_flags": " ,1",
+      "questionable_trips": 2,
+      "records": 50,
+      "report_year": 2025,
+      "reported_trips": 306786051,
+      "state_fips": "25",
+      "tavg_source_flag": "1",
+      "weather_annual_record_available": "True",
+      "weather_station": "USW00014739"
+    }
+  ],
+  "chat": {
+    "id": "db_research_turn:8cea47375c2f42cc9d6b31c7ea523a37",
+    "session_id": "chat_session:ebmmd71ant6h7efccp49",
+    "state": "completed",
+    "question": "Using the reviewed Massachusetts transit, population and Boston Logan weather annual context dataset, show a comparison table for 2022 through 2025 with report year, reported passenger trips, questionable trip record count, July 1 population, Logan average temperature in Celsius and precipitation in millimetres. Explain the reporting-period, geography and quality limitations. Do not infer causality."
+  },
+  "chat_evidence": {
+    "id": "db_query_run:uof6oj8epfp93vxtzmks",
+    "sql": "SELECT \"c_4_report_year\" AS \"report_year\", \"c_5_reported_trips\" AS \"reported_passenger_trips\", \"c_2_questionable_trips\" AS \"questionable_trip_record_count\", \"c_7_population_july1\" AS \"population_july1\", \"c_10_logan_tavg_c\" AS \"logan_average_temperature_c\", \"c_11_logan_prcp_mm\" AS \"logan_precipitation_mm\", \"c_1_missing_trips\" AS \"missing_trip_record_count\", \"c_3_records\" AS \"transit_record_count\", \"c_8_population_vintage\" AS \"population_vintage\", \"c_6_state_fips\" AS \"state_fips\", \"c_12_weather_station\" AS \"weather_station\", \"c_13_tavg_source_flag\" AS \"temperature_source_flag\", \"c_14_prcp_measurement_source_flags\" AS \"precipitation_measurement_source_flags\", \"c_15_weather_annual_record_available\" AS \"weather_annual_record_available\" FROM \"data\" WHERE \"c_4_report_year\" >= 2022 AND \"c_4_report_year\" <= 2025 ORDER BY \"c_4_report_year\" LIMIT 100",
+    "rows": [
+      {
+        "logan_average_temperature_c": "12.000000",
+        "logan_precipitation_mm": "794.900000",
+        "missing_trip_record_count": 0,
+        "population_july1": 7025465,
+        "population_vintage": 2025,
+        "precipitation_measurement_source_flags": " ,W",
+        "questionable_trip_record_count": 3,
+        "report_year": 2022,
+        "reported_passenger_trips": 227309167,
+        "state_fips": "25",
+        "temperature_source_flag": "W",
+        "transit_record_count": 55,
+        "weather_annual_record_available": "True",
+        "weather_station": "USW00014739"
+      },
+      {
+        "logan_average_temperature_c": "12.200000",
+        "logan_precipitation_mm": "1264.600000",
+        "missing_trip_record_count": 0,
+        "population_july1": 7073479,
+        "population_vintage": 2025,
+        "precipitation_measurement_source_flags": " ,W",
+        "questionable_trip_record_count": 2,
+        "report_year": 2023,
+        "reported_passenger_trips": 262844430,
+        "state_fips": "25",
+        "temperature_source_flag": "W",
+        "transit_record_count": 53,
+        "weather_annual_record_available": "True",
+        "weather_station": "USW00014739"
+      },
+      {
+        "logan_average_temperature_c": "12.100000",
+        "logan_precipitation_mm": "1153.300000",
+        "missing_trip_record_count": 0,
+        "population_july1": 7138560,
+        "population_vintage": 2025,
+        "precipitation_measurement_source_flags": " ,W",
+        "questionable_trip_record_count": 2,
+        "report_year": 2024,
+        "reported_passenger_trips": 284112207,
+        "state_fips": "25",
+        "temperature_source_flag": "W",
+        "transit_record_count": 53,
+        "weather_annual_record_available": "True",
+        "weather_station": "USW00014739"
+      },
+      {
+        "logan_average_temperature_c": "11.200000",
+        "logan_precipitation_mm": "943.600000",
+        "missing_trip_record_count": 0,
+        "population_july1": 7154084,
+        "population_vintage": 2025,
+        "precipitation_measurement_source_flags": " ,1",
+        "questionable_trip_record_count": 2,
+        "report_year": 2025,
+        "reported_passenger_trips": 306786051,
+        "state_fips": "25",
+        "temperature_source_flag": "1",
+        "transit_record_count": 50,
+        "weather_annual_record_available": "True",
+        "weather_station": "USW00014739"
+      }
+    ],
+    "result_sha256": "60d5c63f66f6467572c1abaa91700dfd8efe61308a9112745700ec6a6d7beaed",
+    "version_id": "e1473981-740f-474e-ac2a-641fb50b2264",
+    "dataset_sha256": "223847c0142cdd8516bfe81efecc9cb5b1da97453a2d6973fe2ec04225da2629"
+  }
+}

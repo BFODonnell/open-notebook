@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Notebook database answers display a scrollable table of verified result cells, including explicit missing values, alongside their SQL and provenance.
+- Reviewed Census Vintage 2025 state-population and bounded NOAA Boston Logan annual-observation selections in Open Data Explorer, with publisher rights evidence, exact requests and retained quality flags.
+- Explicitly reviewed Massachusetts annual analytical datasets combine immutable NTD, population and weather versions through scoped MCP queries, with grain checks, source evidence, missing-value handling and geographic/reporting-period limitations.
+- Open Data Explorer can discover bounded download links on publisher landing pages and preview XLSX values, with explicit file/worksheet selection and landing-page provenance.
 - Opt-in DataBridge notebook research discovers imported datasets in existing chat, proposes authorized SQL for explicit review/approval, and returns verified result cells, document quotes, immutable-version provenance and bounded annual trends. Durable evidence supports synthesis recovery without replaying SQL; existing model provisioning and usage accounting are preserved.
 - **DataBridge Open Data Explorer:** direct Data.gov catalog search and resource validation, background CSV/JSON/Parquet and bounded single-file ZIP imports, immutable DuckDB publication, notebook schema documentation, scoped MCP queries, provenance and interrupted-job recovery. Opt-in deployment; conversational database analysis remains a subsequent phase.
 - Opt-in DataBridge MCP connections for DBHub/PostgreSQL, curated Google Toolbox tools and isolated immutable DuckDB versions. Adds administrator capability approval, notebook-scoped read-only query review, bounded execution, persistent audit/evidence and Settings controls; other database engines remain uncertified.
@@ -15,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - DataBridge Phase 0 upstream audit, dependency compatibility findings, and isolated DuckDB/MCP concurrency and transport experiments. These developer tools do not enable DataBridge application features.
 
 ### Changed
+- Expanded the README's MCP server and database coverage, listing DBHub, Google MCP Toolbox, and DuckDB while distinguishing upstream connectors from verified application integrations.
+- Clarified the README's agentic AI and MCP workflow, including research-agent planning and synthesis, human approval, scoped tool execution, and the boundary with guided Data.gov discovery.
+- Rewrote the project README for Open Notebook DataBridge, covering its implemented workflows, deployment layers, live verification, credential storage, limitations and upstream attribution.
+- The sidebar app name is now Open Notebook DataBridge in every locale, with wrapping for the longer name.
 - **Documentation rewritten against the code.** Every page under `docs/` was checked against v1.15.0 and rewritten where it described an older or imagined product (#1458, #1459, #1460, #1461):
   - **Install:** one canonical path built on the shipped `docker-compose.yml`, with small override files for the Ollama and LM Studio variants. The network-exposure warning (bind ports to `127.0.0.1` or set a password) comes before the first `docker compose up -d`. Example encryption keys are generated, never copied. First-run setup lives in one place, [Connect a provider](docs/4-AI-PROVIDERS/index.md#connect-a-provider), and ends in a working chat via **Auto-assign Defaults**. The provider table is built from the provider registry: 24 providers, with the model types each one offers
   - **User guide and concepts:** insights are a first-class concept and the context mode is *Insights only*. Ask is described as three stages. UI labels match the current app. Invented features are gone (tags, export/share, batch transformations, page-number citations and others). About 6,200 lines became about 1,450
@@ -22,6 +30,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Development:** `architecture.md`, `testing.md`, `api-reference.md` and `code-standards.md` are rewritten from the code. A new playbook covers adding an AI provider. Dev setup lives on one page. The AGENTS files agree with the docs. Contributor conventions (Conventional Commits, CHANGELOG sections, pre-PR checks that match CI) are documented
 
 ### Fixed
+- A catalog record exceeding the distribution limit remains visibly blocked without hiding other valid search results.
+- DataBridge single-table aggregation now supports safe numeric casts, comma removal and conditional missing counts. Planner guidance distinguishes descriptive requests and negated causal statements; policy rejections expose the unsupported construct.
+- Download diagnostics distinguish host/URL/address policy, publisher denial, timeout, redirects, formats, rights and size limits without logging credentials.
+- DataBridge recognizes explicit CC0 and government-work licenses across catalog/DCAT/distribution fields, while missing or conflicting reuse rights remain blocked. Publisher HTTP 403 responses report access denial separately from licensing.
+- Open Data Explorer distinguishes notebook selection, loading and empty imports, shows import confirmation in a dialog with the destination name, retains retry identity and deduplicates identical imports in the same notebook. Search cards display publisher names instead of raw JSON.
 - Live Data.gov validation now rejects unconfigured model requests instead of returning synthetic fixture answers in notebook and source chat. Offline acceptance fixtures remain separate.
 - DataBridge Compose now advertises the mapped API port to the browser, fixing connection failures when `DATABRIDGE_API_PORT` differs from 5055. Explicit `API_URL` overrides remain supported.
 - **Docs no longer recommend settings that do nothing.** `API_CLIENT_TIMEOUT` was never read by Open Notebook; the timeout guidance now covers what actually applies: `ESPERANTO_LLM_TIMEOUT` per model call (keep it below 600) and the web UI's 10-minute request limit (`NEXT_PUBLIC_API_TIMEOUT_MS`, build time only). Remaining `SURREAL_COMMANDS_MAX_TASKS` advice now uses `OPEN_NOTEBOOK_WORKER_MAX_TASKS`. Docker instructions no longer say to edit `.env` and `docker compose restart`: the shipped compose file doesn't load `.env` into the container and `restart` doesn't reload environment changes, so they now point to the `open_notebook` service's `environment:` block and `docker compose up -d`

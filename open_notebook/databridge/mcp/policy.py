@@ -7,7 +7,7 @@ transport isolation and server-side resource limits. No joins/CTEs/subqueries ye
 import math
 import re
 
-POLICY_VERSION = "databridge-select-v1"
+POLICY_VERSION = "databridge-select-v2"
 IDENTIFIER = re.compile(r"^[a-z_][a-z0-9_]{0,62}$")
 NODES = {
     "Select",
@@ -55,6 +55,13 @@ NODES = {
     "Coalesce",
     "Lower",
     "Upper",
+    "Replace",
+    "TryCast",
+    "Cast",
+    "DataType",
+    "Case",
+    "If",
+    "Nullif",
 }
 
 
@@ -123,7 +130,23 @@ def readonly_sql(
         if isinstance(node, exp.Star) and isinstance(node.parent, exp.Count):
             continue
         if type(node).__name__ not in NODES:
-            raise ValueError("SQL construct is not in the read-only allowlist")
+            raise ValueError("SQL construct is not supported: " + type(node).__name__)
+        if isinstance(node, exp.DataType) and (
+            node.this
+            not in {
+                exp.DataType.Type.BIGINT,
+                exp.DataType.Type.INT,
+                exp.DataType.Type.DOUBLE,
+                exp.DataType.Type.FLOAT,
+                exp.DataType.Type.TEXT,
+                exp.DataType.Type.VARCHAR,
+            }
+            or node.expressions
+            or node.args.get("nested")
+        ):
+            raise ValueError("CAST supports only scalar integer, float or text types")
+        if isinstance(node, exp.TryCast) and dialect != "duckdb":
+            raise ValueError("Safe TRY_CAST conversion requires DuckDB")
         if isinstance(node, exp.Identifier) and not IDENTIFIER.fullmatch(node.name):
             raise ValueError("Unsupported identifier")
         if isinstance(node, exp.Literal) and len(node.this) > 1024:

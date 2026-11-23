@@ -1,5 +1,9 @@
 # Live Data.gov / FTA validation
 
+The [three-source live demo report](../../docs/databridge/THREE_SOURCE_LIVE_DEMO.md)
+contains the November 2026 browser workflow, exact Census/NOAA selections, reviewed
+comparison, independent verification scripts and remaining FTA HTTP 403 limitation.
+
 This is a separate controlled validation project, not a production deployment.
 It uses the real official catalog and publisher, the existing application worker,
 immutable publication and MCP. Without a configured live model, its placeholder

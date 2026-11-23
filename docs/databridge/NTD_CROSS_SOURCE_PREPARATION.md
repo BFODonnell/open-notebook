@@ -1,5 +1,9 @@
 # NTD 2022-2025 and subsequent Census/NOAA preparation
 
+Historical preparation record. The [November 2026 live three-source demo](THREE_SOURCE_LIVE_DEMO.md)
+now implements and verifies the reviewed Massachusetts/Logan comparison; the
+earlier limitations and observations below describe the October state.
+
 Reviewed 2026-10-29. No cross-source comparison has been constructed. The owner
 authorized synthetic fixtures for Phase 3 acceptance because no Data.gov key was
 then configured. A subsequent [live validation](LIVE_NTD_VALIDATION.md) imported the

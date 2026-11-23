@@ -93,9 +93,19 @@ async def context(notebook_id: str) -> dict:
                 "license": metadata.get("license"),
                 "rights": metadata.get("rights"),
                 "download_url": payload["download"]["final_url"],
+                "provenance": {
+                    "catalog_url": payload["catalog_snapshot"].get(
+                        "catalog_identifier"
+                    ),
+                    **payload.get("provenance", {}),
+                    "resolved_download_url": payload["download"]["final_url"],
+                },
                 "retrieved_at": payload["download"]["retrieved_at"],
                 "schema_sha256": payload["manifest"]["schema_sha256"],
-                "semantic_status": "publisher metadata only; cross-source geography/time/units not certified",
+                "semantic_status": payload.get("provenance", {}).get(
+                    "analysis_contract"
+                )
+                or "publisher metadata only; cross-source geography/time/units not certified",
             }
         )
     datasets.sort(key=lambda item: item["import_id"])
@@ -279,9 +289,10 @@ async def prepare(
         plan = await mcp.plan(
             chosen["connection_id"], notebook_id, proposal.sql, None, {}
         )
-    except (InvalidInputError, NotFoundError):
+    except (InvalidInputError, NotFoundError) as error:
         turn["payload"]["answer"] = (
-            "Query rejected by the database authorization policy. No SQL was executed. Ask a new supported question."
+            text(str(error))
+            + ". No SQL was executed. Revise the question using the supported operations."
         )
         await save(turn, "blocked")
         return turn
@@ -462,7 +473,12 @@ def render_answer(answer: Synthesis, payload: dict) -> tuple[str, dict | None]:
             + ". Database SHA-256: "
             + dataset["database_sha256"]
             + ".",
-            "These findings describe only the selected dataset and returned query scope. Synthetic fixtures are not official DOT findings. Geography, time support and units are not certified for cross-source comparisons; no causal inference is made.",
+            "These findings describe only the selected dataset and returned query scope. No causal inference is made. "
+            + (
+                " ".join(dataset["semantic_status"].values())
+                if isinstance(dataset.get("semantic_status"), dict)
+                else "Geography, time support and units have not been reviewed for cross-source comparisons."
+            ),
         ]
     )
     return "\n\n".join(lines), chart

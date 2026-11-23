@@ -303,7 +303,12 @@ async def plan(
             }
         )
         raise InvalidInputError(
-            "Query rejected by the read-only policy or parameter schema"
+            "Query rejected: "
+            + (
+                str(error)
+                if isinstance(error, ValueError)
+                else "Select an approved tool"
+            )
         ) from error
     except (NotFoundError, InvalidInputError):
         await record_audit(

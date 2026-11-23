@@ -2081,9 +2081,11 @@ dependencies = [
 
 [package.optional-dependencies]
 databridge = [
+    { name = "defusedxml" },
     { name = "duckdb" },
     { name = "jsonschema" },
     { name = "mcp" },
+    { name = "openpyxl" },
     { name = "sqlglot" },
 ]
 
@@ -2107,6 +2109,7 @@ requires-dist = [
     { name = "ai-prompter", specifier = ">=0.4,<1" },
     { name = "babel", specifier = ">=2.18.0" },
     { name = "content-core", specifier = ">=2.2.0,<3" },
+    { name = "defusedxml", marker = "extra == 'databridge'", specifier = ">=0.7.1,<1" },
     { name = "duckdb", marker = "extra == 'databridge'", specifier = "==1.5.6" },
     { name = "esperanto", specifier = ">=2.28.0,<3" },
     { name = "fastapi", specifier = ">=0.104.0" },
@@ -2126,6 +2129,7 @@ requires-dist = [
     { name = "loguru", specifier = ">=0.7.2" },
     { name = "mcp", marker = "extra == 'databridge'", specifier = "==1.28.1" },
     { name = "numpy", specifier = ">=2.4.1" },
+    { name = "openpyxl", marker = "extra == 'databridge'", specifier = ">=3.1.5,<4" },
     { name = "podcast-creator", specifier = ">=0.13.1,<1" },
     { name = "pycountry", specifier = ">=26.2.16" },
     { name = "pydantic", specifier = ">=2.9.2" },

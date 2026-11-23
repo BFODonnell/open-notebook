@@ -143,7 +143,7 @@ export function ChatPanel({
         </div>
       </CardHeader>
       <CardContent className="flex-1 flex flex-col min-h-0 p-0">
-        <ScrollArea className="flex-1 min-h-0 px-4" ref={scrollAreaRef}>
+        <ScrollArea className="flex-1 min-h-0 min-w-0 px-4 [&_[data-slot=scroll-area-viewport]>div]:!block" ref={scrollAreaRef}>
           <div className="space-y-4 py-4">
             {messages.length === 0 ? (
               <div className="text-center text-muted-foreground py-8">
@@ -344,7 +344,7 @@ const ChatMessage = memo(function ChatMessage({
           </div>
         </div>
       )}
-      <div className="flex flex-col gap-2 max-w-[80%]">
+      <div className="flex min-w-0 flex-col gap-2 max-w-[80%]">
         <div
           className={`rounded-lg px-4 py-2 border ${
             message.type === 'human'

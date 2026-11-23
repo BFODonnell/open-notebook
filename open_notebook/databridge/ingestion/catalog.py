@@ -63,30 +63,92 @@ async def request(path: str, params: dict | None = None) -> dict:
             raise AcquisitionError("CATALOG_RESPONSE_INVALID") from None
 
 
-def classify(dcat: dict, resource: dict) -> dict:
-    if (
-        str(dcat.get("accessLevel", "")).lower() != "public"
-        or resource.get("accessLevel", "public") != "public"
+def rights_status(metadata: dict, resource: dict) -> dict | None:
+    """Read explicit dataset/distribution declarations, never infer reuse from access.
+
+    Only known schema locations are inspected: unrelated landing-page text and
+    sibling distributions must not grant rights to this resource. Any unknown or
+    conflicting declaration wins over a recognized license.
+    """
+    dcat = metadata.get("dcat", {})
+    scopes = [metadata, dcat if isinstance(dcat, dict) else {}, resource]
+    access = [s[k] for s in scopes for k in ("accessLevel", "access_level") if k in s]
+    if not access or any(
+        not isinstance(a, str) or a.strip().lower() != "public" for a in access
     ):
         return {"status": "unavailable", "reason": "ACCESS_RESTRICTED"}
-    # Data.gov's DOT DCAT uses ["public"]. Only that exact declaration (or
-    # absence) is recognized; free-text licensing/restrictions require review.
-    for rights in (dcat.get("rights"), resource.get("rights")):
-        if rights not in (None, "", [], "public", ["public"]):
-            return {"status": "unavailable", "reason": "RIGHTS_REVIEW_REQUIRED"}
+
+    def values(value):
+        if value is None or value == "" or value == []:
+            return []
+        if isinstance(value, list):
+            return [v for item in value for v in values(item)]
+        if isinstance(value, dict):
+            if set(value) - {"@id", "@value", "@type", "name", "title", "url"}:
+                return [None]
+            known = [
+                value[k]
+                for k in ("@id", "@value", "name", "title", "url")
+                if k in value
+            ]
+            return [v for item in known for v in values(item)] if known else [None]
+        return [value]
+
+    declarations = [
+        v
+        for scope in scopes
+        for key in ("rights", "license")
+        for v in values(scope.get(key))
+    ]
+    supported = {
+        "cc0",
+        "cc0 1.0",
+        "cc0-1.0",
+        "public domain",
+        "https://creativecommons.org/publicdomain/zero/1.0",
+        "http://creativecommons.org/publicdomain/zero/1.0",
+        "https://creativecommons.org/publicdomain/zero/1.0/legalcode",
+        "https://www.usa.gov/government-works",
+    }
+    normalized = [
+        " ".join(v.split()).lower().rstrip("/") if isinstance(v, str) else ""
+        for v in declarations
+    ]
+    # DOT's legacy "public" is an access-style marker, not sufficient alone.
+    if (
+        not normalized
+        or not any(v in supported for v in normalized)
+        or any(v not in supported | {"public"} for v in normalized)
+    ):
+        return {"status": "unavailable", "reason": "RIGHTS_REVIEW_REQUIRED"}
+    return None
+
+
+def classify(metadata: dict, resource: dict) -> dict:
+    if blocked := rights_status(metadata, resource):
+        return blocked
     url = resource.get("downloadURL")
     if not isinstance(url, str):
-        return {"status": "connector_required", "reason": "DIRECT_DOWNLOAD_REQUIRED"}
+        url = resource.get("accessURL")
+        if not isinstance(url, str):
+            return {
+                "status": "connector_required",
+                "reason": "DIRECT_DOWNLOAD_REQUIRED",
+            }
     try:
         validate_public_url(url, hosts())
-    except AcquisitionError:
-        return {"status": "unavailable", "reason": "DOWNLOAD_BLOCKED"}
+    except AcquisitionError as error:
+        return {"status": "unavailable", "reason": error.code}
     hints = [
         str(resource.get("format", "")).lower(),
         str(resource.get("mediaType", "")).lower(),
         Path(urlsplit(url).path).suffix.lstrip(".").lower(),
     ]
     formats = {
+        "xlsx": {
+            "xlsx",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        },
         "csv": {"csv", "text/csv"},
         "json": {"json", "application/json"},
         "jsonl": {"jsonl", "ndjson", "application/x-ndjson"},
@@ -100,7 +162,18 @@ def classify(dcat: dict, resource: dict) -> dict:
     candidates = {
         kind for kind, labels in formats.items() if labels.intersection(hints)
     }
+    if candidates and not resource.get("downloadURL"):
+        return {"status": "connector_required", "reason": "DIRECT_DOWNLOAD_REQUIRED"}
     if len(candidates) != 1:
+        if not candidates and (
+            "text/html" in hints
+            or Path(urlsplit(url).path).suffix.lower() in {"", ".html", ".htm"}
+        ):
+            return {
+                "status": "checking",
+                "reason": "LANDING_PAGE_DISCOVERY_REQUIRED",
+                "adapter": "html",
+            }
         return {"status": "connector_required", "reason": "FORMAT_ADAPTER_REQUIRED"}
     return {
         "status": "checking",
@@ -128,7 +201,10 @@ async def cache_dataset(item: dict) -> dict:
     resources = []
     distributions = dcat.get("distribution") or []
     if not isinstance(distributions, list) or len(distributions) > 30:
-        raise AcquisitionError("CATALOG_RECORD_LIMIT")
+        # Keep the bounded record inspectable without aborting unrelated search
+        # results or silently selecting a subset of its distributions.
+        snapshot["resources_status"] = "CATALOG_RECORD_LIMIT"
+        distributions = []
     for distribution in distributions:
         if not isinstance(distribution, dict):
             continue
@@ -138,7 +214,7 @@ async def cache_dataset(item: dict) -> dict:
         payload = {
             "catalog_id": ref,
             "metadata": distribution,
-            "classification": classify(dcat, distribution),
+            "classification": classify(item, distribution),
         }
         # A search must not erase a completed preflight for the same snapshot.
         if not await repo_query(
@@ -183,7 +259,12 @@ async def search(
         {"id": ensure_record_id(cache_id)},
     )
     if cached:
-        return {"after": None, **cached[0]["payload"]}
+        payload = cached[0]["payload"]
+        return {
+            "after": None,
+            **payload,
+            "results": [await dataset(r["id"]) for r in payload["results"]],
+        }
     result = await request("search", params)
     if not isinstance(result.get("results"), list) or len(result["results"]) > per_page:
         raise AcquisitionError("CATALOG_RESPONSE_INVALID")
@@ -206,7 +287,7 @@ async def search(
 async def dataset(ref: str) -> dict:
     saved = await record("db_catalog", ref)
     payload = saved["payload"]
-    if not payload["resources"]:
+    if not payload["resources"] and not payload.get("resources_status"):
         harvest = payload["metadata"].get("harvest_record")
         if harvest:
             try:
@@ -225,4 +306,9 @@ async def dataset(ref: str) -> dict:
         {"id": key, **(await record("db_resource", key))["payload"]}
         for key in payload["resources"]
     ]
+    for resource in resources:
+        resource["classification"] = classify(payload["metadata"], resource["metadata"])
+        # Policy changes also apply to previously cached preflights.
+        if resource["classification"]["status"] == "unavailable":
+            resource.pop("preflight", None)
     return {"id": ref, **payload, "resources": resources}

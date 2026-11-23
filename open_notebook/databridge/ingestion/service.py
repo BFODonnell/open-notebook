@@ -10,7 +10,7 @@ from uuid import NAMESPACE_URL, UUID, uuid4, uuid5
 from loguru import logger
 
 from open_notebook.database.repository import ensure_record_id, repo_query, repo_upsert
-from open_notebook.databridge.ingestion import catalog
+from open_notebook.databridge.ingestion import catalog, discovery
 from open_notebook.databridge.ingestion.download import AcquisitionError, fetch
 from open_notebook.databridge.ingestion.runtime import parse, root, workspace
 from open_notebook.databridge.mcp import service as mcp
@@ -37,21 +37,48 @@ async def preflight(resource_id: str) -> dict:
     resource = await catalog.record("db_resource", resource_id)
     item = resource["payload"]
     parent = await catalog.record("db_catalog", item["catalog_id"])
-    classification = catalog.classify(
-        parent["payload"]["metadata"].get("dcat", {}), item["metadata"]
-    )
+    classification = catalog.classify(parent["payload"]["metadata"], item["metadata"])
     if classification["status"] != "checking":
         return classification
     try:
         async with workspace() as folder:
+            if classification["adapter"] == "html":
+                result = await discovery.discover(item, parent["payload"], folder)
+                item["preflight"] = result
+                await repo_upsert("db_resource", resource_id, {"payload": item}, True)
+                return result
             downloaded = await fetch(
                 item["metadata"]["downloadURL"], folder / "payload"
             )
             if downloaded.content_type in {"text/html", "application/xhtml+xml"}:
                 raise AcquisitionError("FORMAT_MISMATCH")
             profile = await parse(
-                folder / "payload", folder / "preview.duckdb", classification["adapter"]
+                folder / "payload",
+                folder / "preview.duckdb",
+                classification["adapter"],
+                item["metadata"].get("sheet"),
             )
+            if "sheets" in profile:
+                candidates = []
+                for sheet in profile["sheets"]:
+                    candidate = await discovery.child(
+                        item,
+                        {**item["metadata"], "sheet": sheet, "title": sheet},
+                        {
+                            **item.get("provenance", {}),
+                            "workbook_sha256": downloaded.sha256,
+                        },
+                    )
+                    candidate["classification"] = classification
+                    candidates.append(candidate)
+                result = {
+                    "status": "connector_required",
+                    "reason": "WORKSHEET_SELECTION_REQUIRED",
+                    "resources": candidates,
+                }
+                item["preflight"] = result
+                await repo_upsert("db_resource", resource_id, {"payload": item}, True)
+                return result
         result = {
             "status": "ready",
             "reason": "VALIDATED",
@@ -60,8 +87,10 @@ async def preflight(resource_id: str) -> dict:
             "profile": profile,
             "checked_at": mcp.now(),
             "expires_at": future(900),
+            "provenance": item.get("provenance", {}),
         }
     except AcquisitionError as error:
+        logger.warning("Preflight {} stopped ({})", resource_id, error.code)
         result = {
             "status": "connector_required"
             if error.code
@@ -102,6 +131,18 @@ def public_job(job: dict) -> dict:
         or job.get("lease_until", "") < mcp.now()
         and job["status"] in {"queued", "running"},
         **job["payload"],
+        "provenance": {
+            "catalog_url": job["payload"]
+            .get("catalog_snapshot", {})
+            .get("catalog_identifier"),
+            "resource_url": job["payload"]
+            .get("resource_snapshot", {})
+            .get("downloadURL"),
+            **job["payload"].get("provenance", {}),
+            "resolved_download_url": job["payload"]
+            .get("download", {})
+            .get("final_url"),
+        },
     }
 
 
@@ -132,6 +173,8 @@ async def submit(job_id: str):
 async def create_import(
     resource_id: str, notebook_id: str, idempotency_key: str
 ) -> dict:
+    if not notebook_id.startswith("notebook:"):
+        raise InvalidInputError("Select a valid destination notebook")
     await Notebook.get(notebook_id)
     UUID(idempotency_key)
     job_id = (
@@ -148,9 +191,51 @@ async def create_import(
     if existing:
         return public_job(existing[0])
     resource = (await catalog.record("db_resource", resource_id))["payload"]
+    parent = (await catalog.record("db_catalog", resource["catalog_id"]))["payload"]
+    classification = catalog.classify(parent["metadata"], resource["metadata"])
+    if (
+        classification["status"] != "checking"
+        or classification.get("adapter") == "html"
+    ):
+        raise InvalidInputError(
+            "Resource cannot be imported: " + classification["reason"]
+        )
     check = resource.get("preflight", {})
     if check.get("status") != "ready" or check.get("expires_at", "") < mcp.now():
         raise InvalidInputError("Inspect and validate this resource before importing")
+    # A browser retry/reload may generate a new request key. Identity is scoped
+    # to the notebook, logical catalog dataset, selected file/sheet and bytes.
+    # CREATE below arbitrates concurrent requests for the same import.
+    job_id = (
+        "db_import:"
+        + digest(
+            {
+                "notebook": notebook_id,
+                "catalog": parent["catalog_identifier"],
+                "url": resource["metadata"]["downloadURL"],
+                "sheet": resource["metadata"].get("sheet"),
+                "sha256": check["download"]["sha256"],
+            }
+        )[:40]
+    )
+    existing = await repo_query("SELECT * FROM $id", {"id": ensure_record_id(job_id)})
+    if existing:
+        return public_job(existing[0])
+    # Include jobs created before content-based identity was introduced.
+    previous = await repo_query(
+        "SELECT * FROM db_import WHERE notebook_id=$notebook AND payload.catalog_snapshot.catalog_identifier=$catalog AND payload.resource_snapshot.downloadURL=$url AND payload.preflight.download.sha256=$sha LIMIT 100",
+        {
+            "notebook": notebook_id,
+            "catalog": parent["catalog_identifier"],
+            "url": resource["metadata"]["downloadURL"],
+            "sha": check["download"]["sha256"],
+        },
+    )
+    for job in previous:
+        if job["payload"]["resource_snapshot"].get("sheet") == resource["metadata"].get(
+            "sheet"
+        ):
+            return public_job(job)
     token = get_secret_from_env("DATABRIDGE_DUCKDB_TOKEN")
     if not token or len(token) < 20:
         raise ConfigurationError(
@@ -161,7 +246,6 @@ async def create_import(
     )
     if active and active[0]["n"] >= 20:
         raise InvalidInputError("Import queue is full")
-    parent = (await catalog.record("db_catalog", resource["catalog_id"]))["payload"]
     data = {
         "status": "queued",
         "stage": "queued",
@@ -178,6 +262,10 @@ async def create_import(
             ),
             "catalog_snapshot": parent,
             "resource_snapshot": resource["metadata"],
+            "provenance": {
+                "catalog_url": parent["catalog_identifier"],
+                **resource.get("provenance", {}),
+            },
             "preflight": check,
             "queued_at": mcp.now(),
             "history": [{"stage": "queued", "at": mcp.now()}],
@@ -261,12 +349,20 @@ async def process(job_id: str) -> bool:
             published = root() / "published" / (version + ".json")
             if not published.exists():
                 await transition("downloading")
-                info = await fetch(
-                    payload["resource_snapshot"]["downloadURL"], folder / "payload"
-                )
-                if info.sha256 != payload["preflight"]["download"]["sha256"]:
-                    raise AcquisitionError("SOURCE_CHANGED_RECHECK_REQUIRED")
+                if payload.get("analysis"):
+                    from open_notebook.databridge.comparison import materialize
+
+                    info = await materialize(payload, job["notebook_id"], folder)
+                else:
+                    info = await fetch(
+                        payload["resource_snapshot"]["downloadURL"], folder / "payload"
+                    )
+                    if info.sha256 != payload["preflight"]["download"]["sha256"]:
+                        raise AcquisitionError("SOURCE_CHANGED_RECHECK_REQUIRED")
                 payload["download"] = {**asdict(info), "retrieved_at": mcp.now()}
+                payload.setdefault("provenance", {})["resolved_download_url"] = (
+                    info.final_url
+                )
                 await transition("validating")
                 if info.content_type in {"text/html", "application/xhtml+xml"}:
                     raise AcquisitionError("FORMAT_MISMATCH")
@@ -279,7 +375,10 @@ async def process(job_id: str) -> bool:
                         raise AcquisitionError("STAGING_INVALID")
                     path.unlink(missing_ok=True)
                 payload["profile"] = await parse(
-                    folder / "payload", stage_file, payload["preflight"]["adapter"]
+                    folder / "payload",
+                    stage_file,
+                    payload["preflight"]["adapter"],
+                    payload["resource_snapshot"].get("sheet"),
                 )
                 await transition("staging")
                 await transition("profiling")
@@ -348,6 +447,7 @@ async def process(job_id: str) -> bool:
                         "connection_id": connection_id,
                         "publisher": payload["catalog_snapshot"]["publisher"],
                         "download_url": payload["download"]["final_url"],
+                        "provenance": payload.get("provenance", {}),
                         "raw_sha256": payload["download"]["sha256"],
                         "rows": payload["profile"]["rows"],
                         "columns": payload["profile"]["columns"],
@@ -394,7 +494,7 @@ async def process(job_id: str) -> bool:
             "Import {} stopped at {} ({})",
             job_id,
             payload.get("history", [{}])[-1].get("stage"),
-            type(error).__name__,
+            error.code if isinstance(error, AcquisitionError) else type(error).__name__,
         )
         code = error.code if isinstance(error, AcquisitionError) else "IMPORT_FAILED"
         payload["error"] = {
@@ -452,6 +552,7 @@ async def notebook_context(notebook_id: str) -> dict:
                 "rows": job["profile"]["rows"],
                 "raw_sha256": job["download"]["sha256"],
                 "database_sha256": job["manifest"]["sha256"],
+                "provenance": job.get("provenance", {}),
             }
         )
     return {

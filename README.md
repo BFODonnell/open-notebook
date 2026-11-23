@@ -1,334 +1,225 @@
-<a id="readme-top"></a>
+# Open Notebook DataBridge
 
-<!-- [![Contributors][contributors-shield]][contributors-url] -->
-[![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
-[![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
-<!-- [![LinkedIn][linkedin-shield]][linkedin-url] -->
+**Agentic AI research over public data, with human approval and verifiable database execution through MCP.**
 
+Open Notebook DataBridge extends [Open Notebook](https://github.com/lfnovo/open-notebook) with a bounded research agent that turns notebook questions into SQL proposals and evidence-backed answers. Users discover and import public data, review the agent's proposed query, and approve execution through the **Model Context Protocol (MCP)**. Immutable DuckDB datasets and recorded query evidence make the results traceable. The application retains the original notebook, document, notes, search, transformation, and podcast features.
 
-<!-- PROJECT LOGO -->
-<br />
-<div align="center">
-  <a href="https://github.com/lfnovo/open-notebook">
-    <img src="docs/assets/hero.svg" alt="Logo">
-  </a>
+This is the [DataBridge fork](https://github.com/BFODonnell/open-notebook). The setup and features below describe this fork; the original project and its contributors are credited at the end.
 
-  <h3 align="center">Open Notebook</h3>
+[Live demo and evidence](docs/databridge/THREE_SOURCE_LIVE_DEMO.md) · [Deployment](deployment/databridge/README.md) · [Documentation](docs/index.md) · [Changelog](CHANGELOG.md)
 
-  <p align="center">
-    An open source, privacy-focused alternative to Google's Notebook LM!
-    <br /><strong>Join our <a href="https://discord.gg/37XJPXfz2w">Discord server</a> for help, to share workflow ideas, and suggest features!</strong>
-    <br />
-    <a href="https://www.open-notebook.ai"><strong>Checkout our website »</strong></a>
-    <br />
-    Follow <a href="https://x.com/lfnovo">@lfnovo on X</a> for updates
-    <br />
-    <br />
-    <a href="docs/0-START-HERE/index.md">📚 Get Started</a>
-    ·
-    <a href="docs/3-USER-GUIDE/index.md">📖 User Guide</a>
-    ·
-    <a href="docs/2-CORE-CONCEPTS/index.md">✨ Features</a>
-    ·
-    <a href="docs/1-INSTALLATION/index.md">🚀 Deploy</a>
-  </p>
-</div>
+## What DataBridge adds
 
-<p align="center">
-<a href="https://trendshift.io/repositories/14536" target="_blank"><img src="https://trendshift.io/api/badge/repositories/14536" alt="lfnovo%2Fopen-notebook | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
-</p>
+- **Open Data Explorer:** search Data.gov, inspect publisher metadata and reuse rights, validate a resource, preview its schema and sample rows, and import it into a selected notebook.
+- **Download discovery:** find supported files on bounded publisher landing pages, with explicit file and worksheet selection. Import paths support CSV, flat JSON/JSON Lines, Parquet, supported XLSX, and bounded single-file ZIP archives.
+- **Immutable datasets:** publish versioned DuckDB datasets with source URLs, retrieval details, checksums, schema mappings, and processing history. Schema documentation is attached to the same notebook.
+- **Agentic notebook research:** the research agent interprets a question against available dataset schemas, proposes SQL, and synthesizes an answer from returned evidence. Inspect the selected version and canonical SQL, then explicitly approve MCP execution. Answers include verified result cells, a result table, and query provenance; supported annual aggregations can also produce a trend chart.
+- **MCP database integrations:** the deployment includes DBHub, Google's MCP Toolbox for Databases, and an isolated DuckDB broker. These provide a foundation for relational, cloud, and analytical database access, with explicit connection approval and notebook scopes. See [database coverage and verification status](#mcp-servers-and-database-coverage).
+- **A three-source comparison:** select official Census population and NOAA Boston Logan observations alongside FTA NTD Service data. Review the transformation contract and SQL before creating an annual analytical dataset.
+- **Visible processing and safe retries:** confirmation names the destination, and accepted jobs show progress or actionable errors. Retrying the same selected file and content in the same notebook reuses the existing import.
+- **Model gateway and usage accounting:** optional LiteLLM routing provides model configuration, usage records, and budget controls. Existing direct providers remain available; gateway accounting covers gateway-routed calls.
 
-<div align="center">
-  <!-- Keep these links. Translations will automatically update with the README. -->
-  <a href="https://zdoc.app/de/lfnovo/open-notebook">Deutsch</a> | 
-  <a href="https://zdoc.app/es/lfnovo/open-notebook">Español</a> | 
-  <a href="https://zdoc.app/fr/lfnovo/open-notebook">français</a> | 
-  <a href="https://zdoc.app/ja/lfnovo/open-notebook">日本語</a> | 
-  <a href="https://zdoc.app/ko/lfnovo/open-notebook">한국어</a> | 
-  <a href="https://zdoc.app/pt/lfnovo/open-notebook">Português</a> | 
-  <a href="https://zdoc.app/ru/lfnovo/open-notebook">Русский</a> | 
-  <a href="https://zdoc.app/zh/lfnovo/open-notebook">中文</a>
-</div>
+Public accessibility alone does not establish unrestricted reuse. Missing, conflicting, or restrictive rights remain blocked. Download diagnostics distinguish host policy, publisher denial, timeouts, redirects, formats, and resource limits.
 
-## A private, multi-model, 100% local, full-featured alternative to Notebook LM
+## Agentic AI and MCP
 
-![New Notebook](docs/assets/asset_list.png)
+The agentic workflow is **plan → review → approve → execute through MCP → synthesize and verify**. The model proposes the analytical action and interprets its results; the application enforces authorization, SQL policy, execution limits, and evidence checks. Human approval is an explicit step in the agent workflow.
 
-In a world dominated by Artificial Intelligence, having the ability to think 🧠 and acquire new knowledge 💡, is a skill that should not be a privilege for a few, nor restricted to a single provider.
+| Stage | Responsibility |
+| --- | --- |
+| Discover and import | The user searches Data.gov and selects resources. Application services check rights, resolve supported downloads, validate data, and publish immutable versions. |
+| Plan | The research agent receives the notebook question and available dataset context, then proposes a dataset and SQL for the supported analysis. |
+| Review and approve | The application validates and canonicalizes the query. The user reviews its dataset, version, and SQL and explicitly approves execution. |
+| Execute with MCP | The application invokes the scoped database tool through MCP, enforcing the approved query and recording result and provenance evidence. |
+| Synthesize and verify | The agent drafts an answer from the returned evidence. Application checks validate cited result cells and supported document quotes before displaying the answer. |
 
-**Open Notebook empowers you to:**
-- 🔒 **Control your data** - Keep your research private and secure
-- 🤖 **Choose your AI models** - 20+ providers including OpenAI, Anthropic, Google, Mistral, Ollama and any OpenAI-compatible server (LM Studio, vLLM)
-- 📚 **Organize multi-modal content** - PDFs, videos, audio, web pages, and more
-- 🎙️ **Generate professional podcasts** - Advanced multi-speaker podcast generation
-- 🔍 **Search intelligently** - Full-text and vector search across all your content
-- 💬 **Chat with context** - AI conversations powered by your research
-- 🌐 **Multi-language UI** - English, Bengali, Catalan, Chinese (Simplified & Traditional), French, German, Italian, Japanese, Polish, Portuguese, Russian, Spanish and Turkish
+**MCP provides the database tool boundary for the agentic workflow.** It connects approved research actions to configured database services, including the immutable DuckDB broker used for imported public data. Notebook scope, approved capabilities, and recorded query evidence connect each answer to the data actually queried.
 
-Learn more about our project at [https://www.open-notebook.ai](https://www.open-notebook.ai)
+Data.gov discovery currently uses the catalog API directly and remains a guided user workflow. The agent operates on datasets available to the notebook; autonomous catalog search, dataset acquisition, and open-ended retry loops are outside the current implementation. The three-source preparation workflow uses a fixed, reviewed transformation contract. Its resulting dataset becomes available to the research agent for questions.
 
----
+## MCP servers and database coverage
 
-## 🆚 Open Notebook vs Google Notebook LM
+DataBridge includes **three MCP server integrations** connecting its agentic research and database controls to data tools. DBHub and Toolbox bring broad upstream database connector ecosystems; the DuckDB broker serves immutable datasets imported into notebooks.
 
-| Feature | Open Notebook | Google Notebook LM | Advantage |
-|---------|---------------|--------------------|-----------|
-| **Privacy & Control** | Self-hosted, your data | Google cloud only | Complete data sovereignty |
-| **AI Provider Choice** | 20+ providers, cloud or local (OpenAI, Anthropic, Google, Ollama, LM Studio, etc.) | Google models only | Flexibility and cost optimization |
-| **Podcast Speakers** | 1-4 speakers with custom profiles | 2 speakers only | Extreme flexibility |
-| **Content Transformations** | Custom and built-in | Limited options | Unlimited processing power |
-| **API Access** | Full REST API | No API | Complete automation |
-| **Deployment** | Docker, cloud, or local | Google hosted only | Deploy anywhere |
-| **Citations** | Answers cite the sources, notes and insights they used | Comprehensive with sources | Research integrity |
-| **Customization** | Open source, fully customizable | Closed system | Unlimited extensibility |
-| **Cost** | Pay only for AI usage | Free tier + Monthly subscription | Transparent and controllable |
+| MCP integration | Database coverage | Current DataBridge verification |
+| --- | --- | --- |
+| **DBHub 1.5.0** | PostgreSQL, SQL Server, MySQL, MariaDB, SQLite, and Oracle | PostgreSQL is enabled and integration tested through the application. Other engines remain targets for separate certification and are blocked by the current DBHub execution policy. |
+| **Google MCP Toolbox for Databases 1.15.0** | Connectors include AlloyDB, BigQuery, Cloud SQL, Spanner, Firestore, PostgreSQL, MySQL, SQL Server, Oracle, MongoDB, Redis, Elasticsearch, Neo4j, ClickHouse, Snowflake, and more | Reviewed, fixed PostgreSQL tools are integration tested through the application. Additional connectors require operator configuration, capability approval, and engine-specific validation. |
+| **Isolated DuckDB MCP broker** | Local, versioned DuckDB datasets, including imported public data and reviewed analytical datasets | Integration tested and exercised in the live browser workflow: imports, schema inspection, approved SQL, verified results, and provenance. |
 
-**Why Choose Open Notebook?**
-- 🔒 **Privacy First**: Your sensitive research stays completely private
-- 💰 **Cost Control**: Choose cheaper AI providers or run locally with Ollama
-- 🎙️ **Better Podcasts**: Full script control and multi-speaker flexibility vs limited 2-speaker deep-dive format
-- 🔧 **Unlimited Customization**: Modify, extend, and integrate as needed
-- 🌐 **No Vendor Lock-in**: Switch providers, deploy anywhere, own your data
+The connector lists above describe the pinned upstream servers' capabilities, as documented by [DBHub](https://github.com/bytebase/dbhub/blob/v1.5.0/README.md) and [MCP Toolbox](https://github.com/googleapis/mcp-toolbox/blob/v1.15.0/README.md). They are distinct from the application paths we have validated. Earlier SQLite transport experiments are recorded separately and do not establish current application support for SQLite. See the [MCP integration report](docs/databridge/PHASE_2_REPORT.md) and [live demo evidence](docs/databridge/THREE_SOURCE_LIVE_DEMO.md).
 
-### Built With
+In **Settings → Database connections**, an administrator registers an approved MCP endpoint, sets notebook scope and table/column or curated-tool permissions, discovers capabilities, and explicitly approves them. Users can inspect schemas and review supported queries or prepared-tool calls before execution. Database credentials stay in the operator's server configuration; the application stores encrypted MCP bearer credentials.
 
-[![Python][Python]][Python-url] [![Next.js][Next.js]][Next-url] [![React][React]][React-url] [![SurrealDB][SurrealDB]][SurrealDB-url] [![LangChain][LangChain]][LangChain-url]
+The [MCP deployment guide](deployment/databridge/mcp/README.md) explains DBHub configuration, Toolbox prepared tools, the DuckDB broker, and network access. Enabling another database requires an appropriate server configuration, restricted database credentials, and validation of that engine's permissions and behavior. DBHub engines beyond PostgreSQL also require extending the application's current execution policy.
 
-## 🚀 Quick Start
+## How it works
+
+```mermaid
+flowchart LR
+    A[Data.gov or reviewed publisher selection] --> B[Rights checks and validated preview]
+    B --> C[Background import worker]
+    C --> D[Immutable DuckDB version and provenance]
+    D --> E[Research agent proposes SQL from notebook context]
+    E --> F[Human reviews SQL and explicitly approves]
+    F --> G[Scoped MCP execution]
+    G --> H[Agent synthesizes answer from query evidence]
+    H --> I[Application verifies evidence and displays results]
+```
+
+The frontend uses Next.js and React; FastAPI coordinates notebook state in SurrealDB and background jobs. The isolated DuckDB broker reads published versions. LangGraph implements the research agent's planning and synthesis stages, and Esperanto provides model access, with LiteLLM and PostgreSQL providing the optional gateway and usage ledger. DBHub/PostgreSQL and curated Toolbox integrations are available through separately configured MCP connections.
+
+Importing a dataset does not paste every row into document chat. The notebook receives schema and provenance documentation; database questions query the actual immutable table through the reviewed MCP path.
+
+## Verified live demonstration
+
+The November 22, 2026 run created a fresh notebook, imported all three real sources through the browser, approved a seven-query comparison, and asked the notebook research agent a substantive comparison question. The agent's generated SQL was reviewed and executed through MCP, and its answer was checked against returned evidence. Independent Python CSV calculations reproduced the results from downloads matching the imported SHA-256 hashes. Reload, application restart, and retry checks preserved results without duplicate imports.
+
+| Source | Actual selection | Observed imported dimensions |
+| --- | --- | --- |
+| FTA National Transit Database | 2022–2025 Annual Data - Service (by Mode and Time Period), CSV asset `wwdp-t4re` | 51,716 rows × 69 columns |
+| U.S. Census Bureau | Vintage 2025 state population estimates; July 1 estimates for the comparison years | 66 rows × 97 columns |
+| NOAA NCEI | Global Summary of the Year, Boston Logan `USW00014739`, 2022–2025, TAVG and PRCP, metric units | 4 rows × 10 columns |
+| Reviewed analytical dataset | Massachusetts transit and population with Boston Logan weather context | 4 rows × 15 columns |
+
+These dimensions describe that run, not permanent assertions about changing publisher data. The [complete live report](docs/databridge/THREE_SOURCE_LIVE_DEMO.md) records exact URLs, SQL, versions, calculations, limitations, and reproduction steps. [Machine-readable evidence](docs/databridge/evidence/three_source_live.json) includes schemas and query results.
+
+The comparison aggregates only NTD `Annual Total` rows before attaching one Census population estimate and one Boston Logan weather observation per year. It checks duplicate keys and retains missing values and quality flags. Per-resident ratios are withheld when transit values are missing or questionable.
+
+This is descriptive context: agency reporting years, Census July 1 estimates, and weather calendar years differ. Boston Logan is not a statewide weather average, and agency headquarters do not define where all trips occurred. The comparison does not establish causality or a balanced agency panel.
+
+## Run DataBridge
 
 ### Prerequisites
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (macOS, Windows) or Docker Engine with the Compose plugin (Linux)
-- An API key from an AI provider, or a local model server such as Ollama. You add it in the UI, not in config files.
 
-### Step 1: Download docker-compose.yml
+- Docker Desktop with Linux containers, or Docker Engine with Compose v2.
+- Credentials and model access for the provider you configure.
+- A personal `DATAGOV_API_KEY` for Data.gov discovery; automated access does not accept `DEMO_KEY`.
+- `uv` for Python development and the live validation launcher. Native frontend development also needs Node.js/npm.
+
+Clone this fork and work from its root:
+
 ```bash
-mkdir open-notebook && cd open-notebook
-curl -o docker-compose.yml https://raw.githubusercontent.com/lfnovo/open-notebook/main/docker-compose.yml
+git clone https://github.com/BFODonnell/open-notebook.git Open_Notebook_DataBridge
+cd Open_Notebook_DataBridge
 ```
 
-This is the official [docker-compose.yml](docker-compose.yml) from this repository. It runs two services: `surrealdb` (the database) and `open_notebook` (UI, API and background worker).
+### Configure the application stack
 
-### Step 2: Set your encryption key
-Edit `docker-compose.yml` and change this line:
-```yaml
-- OPEN_NOTEBOOK_ENCRYPTION_KEY=change-me-to-a-secret-string
-```
-to a long random secret you generate yourself (for example with `openssl rand -hex 32`; [other options](docs/1-INSTALLATION/docker-compose.md#step-2-set-your-encryption-key)). It encrypts the API keys you store; keep it.
+DataBridge is enabled through layered Compose files. The base gateway file alone does not enable dataset imports or database chat.
 
-> **Shared network or server?** The UI (`8502`) and API (`5055`) are published on all network interfaces and there is no password by default. If other devices can reach this machine, change those two port lines to `"127.0.0.1:8502:8502"` and `"127.0.0.1:5055:5055"`, or add `- OPEN_NOTEBOOK_PASSWORD=your-password` to the `environment:` block, before starting.
+| Layer | Compose file | Setup guide |
+| --- | --- | --- |
+| Application, database and model gateway | `compose.databridge.yml` | [Gateway and credentials](deployment/databridge/README.md) |
+| Scoped database access and DuckDB broker | `compose.databridge-mcp.yml` | [MCP configuration](deployment/databridge/mcp/README.md) |
+| Catalog discovery and imports | `compose.databridge-ingestion.yml` | [Open Data Explorer](deployment/databridge/ingestion/README.md) |
+| Research agent: SQL planning and evidence-backed answers | `compose.databridge-research.yml` | [Conversational research](deployment/databridge/research/README.md) |
 
-### Step 3: Start services
+1. Copy `deployment/databridge/.env.example` to `.env.databridge`. Configure independent application, database, encryption, and gateway secrets using the gateway guide. Select a model your account can access and its provider endpoint.
+2. Add the MCP administrator/broker tokens and reviewed DBHub/Toolbox configuration paths described in the MCP guide. The full overlay includes those services and requires their configuration; it is not a zero-configuration quick start. Store private connector files under `.databridge-private/` or outside the build context.
+3. Add your personal `DATAGOV_API_KEY`. The default publisher host list includes the supported DOT, Census, and NOAA hosts; an explicit operator override replaces that list.
+4. Once those settings are complete, build and start the full stack:
+
 ```bash
-docker compose up -d
+docker compose --env-file .env.databridge -f compose.databridge.yml -f compose.databridge-mcp.yml -f compose.databridge-ingestion.yml -f compose.databridge-research.yml up -d --build --wait --wait-timeout 180
 ```
 
-Wait about 30 seconds, then open: **http://localhost:8502**
+The standard DataBridge stack serves the UI at **http://localhost:8502** and the API at **http://localhost:5055**. Sign in with the configured application password. `DATABRIDGE_UI_PORT` and `DATABRIDGE_API_PORT` change the host ports. The application container starts the frontend, API, and required worker; keep all three running.
 
-### Step 4: Connect an AI provider
-1. In the sidebar, open **Models** (under Manage).
-2. Find your provider (OpenAI, Anthropic, Google, etc.) and click **Add Configuration**.
-3. Enter a name and your API key (local providers such as Ollama need a **Base URL** instead), then click **Add Configuration**.
-4. Click **Test** on the new configuration to check the connection.
-5. Click **Models**, choose a **Model Type**, tick the models to add and click **Add**. Add at least one **Language** model and one **Embedding** model.
-6. Under **Default Model Assignments**, click **Auto-assign Defaults** (or pick the models yourself).
+The original `docker-compose.yml` remains available for the underlying Open Notebook application. It does not replace the DataBridge overlays, and an upstream prebuilt image does not include this fork's new implementation.
 
-Done! Create a notebook, add a source and start chatting. Full walkthrough: [Connect a provider](docs/4-AI-PROVIDERS/index.md#connect-a-provider).
+### Existing live demo environment
 
-> **Need an API key?** Get one from:
-> [OpenAI](https://platform.openai.com/api-keys) · [Anthropic](https://console.anthropic.com/settings/keys) · [Google](https://aistudio.google.com/app/apikey) · [Groq](https://console.groq.com/keys)
->
-> Anthropic and Groq have no embedding models; pair them with a provider that does (see the [matrix](#provider-support-matrix)).
+The separate live validation environment uses **http://localhost:18503** for the UI and port **15056** for the API. It has its own configuration and persistent volumes. After completing the image and credential setup in the [live launcher guide](scripts/databridge_live/README.md), manage it with:
 
-> **Want free local AI?** See the [Local Quick Start](docs/0-START-HERE/quick-start-local.md) (Ollama in Docker).
+```bash
+uv run --no-sync python scripts/databridge_live/run.py up
+uv run --no-sync python scripts/databridge_live/run.py stop
+```
 
----
+The launcher is a controlled validation environment, not the default installation path. Real notebook chat requires a configured live model. The launcher guide explains how to use an OpenRouter credential saved in the app; an unconfigured placeholder does not produce synthetic answers in place of a real provider.
 
-### 📚 More Installation Options
+### Use the explorer and research agent
 
-- **[Local AI with Ollama](docs/0-START-HERE/quick-start-local.md)** - Run models locally without API costs
-- **[Docker Compose guide](docs/1-INSTALLATION/docker-compose.md)** - Settings, backups, updates, remote access
-- **[From Source (Developers)](docs/1-INSTALLATION/from-source.md)** - For development and contributions
-- **[Complete Installation Guide](docs/1-INSTALLATION/index.md)** - All deployment scenarios
+1. Create a notebook and select it as the destination in **Open Data Explorer**.
+2. Search Data.gov, inspect a dataset, choose a supported resource, and **Validate and preview**.
+3. Click **Import**, confirm the destination, and wait for **Ready - database query verified**.
+4. Open that notebook and ask the research agent a supported data question.
+5. Review the agent's proposed dataset version and SQL, then **Approve and execute through MCP**.
+6. Inspect the agent's answer alongside the verified result table, query evidence, and provenance.
 
----
+For the three-source demo, also import the Census and NOAA selections, then use **Reviewed annual comparison** to choose all three source versions and approve the transformation. Follow the [demo walkthrough](docs/databridge/THREE_SOURCE_LIVE_DEMO.md#reproduce) for the exact selections and chat question.
 
-### 📖 Need Help?
+## Credentials, privacy and persistence
 
-- **🤖 AI Installation Assistant**: [CustomGPT to help you install](https://chatgpt.com/g/g-68776e2765b48191bd1bae3f30212631-open-notebook-installation-assistant)
-- **🆘 Troubleshooting**: [5-minute troubleshooting guide](docs/6-TROUBLESHOOTING/quick-fixes.md)
-- **💬 Community Support**: [Discord Server](https://discord.gg/37XJPXfz2w)
-- **🐛 Report Issues**: [GitHub Issues](https://github.com/lfnovo/open-notebook/issues)
+Credentials entered under **Models** are encrypted in SurrealDB's `credential` table using the configured `OPEN_NOTEBOOK_ENCRYPTION_KEY`. Preserve that encryption key with your database backups.
 
----
+The two gateway configuration paths differ:
 
-## Star History
+- **Standard Compose setup:** the operator supplies the provider credential as `OPENAI_API_KEY` through the protected `.env.databridge` file. The endpoint and model determine which provider receives it.
+- **App-stored OpenRouter setup used by the live demo:** `.env.databridge-live-validation` stores `DATABRIDGE_OPENROUTER_CREDENTIAL`, the credential record ID, and the encryption/service configuration. The launcher loads the encrypted provider key from SurrealDB and passes the decrypted value to LiteLLM's runtime environment as `OPENAI_API_KEY`. It does not copy that provider key into the environment file.
 
-[![Star History Chart](https://star-history.dera.page/svg?repos=lfnovo/open-notebook&type=date&legend=top-left)](https://star-history.dera.page/#lfnovo/open-notebook&type=date&legend=top-left)
+`OPENAI_API_KEY` is the gateway's variable name; in the OpenRouter setup its value is an OpenRouter credential. Docker administrators can inspect container runtime environments. Do not commit secret files or put provider keys in frontend variables.
 
+The application and datasets are self-hosted. A configured cloud model receives the context and query evidence supplied to it; self-hosting does not make cloud-provider calls local. Back up notebook/checkpoint data, SurrealDB, published dataset versions, LiteLLM's database, and stable secret configuration together. Keep the development password-based service on a trusted network; it is not a hardened multi-tenant deployment.
 
-## Provider Support Matrix
+## Current boundaries
 
-Thanks to the [Esperanto](https://github.com/lfnovo/esperanto) library, we support these providers out of the box. The columns show the model types each provider offers; what you can use depends on your account.
+- SQL is bounded and read-only, scoped to approved tables, columns, notebook, and immutable version. Safe scalar numeric conversion and conditional aggregation are supported. Arbitrary joins, subqueries, file/network functions, and writes are not enabled.
+- The cross-source workflow is the explicit Massachusetts/Boston Logan contract for 2022–2025. It creates a reviewed analytical dataset; it is not a general geography-matching or cross-database join engine.
+- The original 2023 FTA Operating Expenses and Agency Information landing/file endpoints returned publisher HTTP 403 in the live environment. Their explicit CC0 is recognized, but that external denial remains. Successful HTML/XLSX parsing tests do not establish live access to those endpoints.
+- Public access alone never grants reuse rights. The conflicting NOAA Data.gov entry remains restricted; the supported NOAA selection uses independently reviewed publisher metadata and policy evidence.
+- Imports retain download, parser, publication, and query limits. General authenticated downloads, arbitrary API endpoints, and unsupported formats require additional adapters.
+- Gateway costs are estimates for routed usage, not a complete provider invoice. New DataBridge UI keys exist in all 14 locales; some non-English entries still contain English text.
 
-| Provider     | LLM Support | Embedding Support | Speech-to-Text | Text-to-Speech |
-|--------------|-------------|------------------|----------------|----------------|
-| OpenAI       | ✅          | ✅               | ✅             | ✅             |
-| Anthropic    | ✅          | ❌               | ❌             | ❌             |
-| Google (GenAI) | ✅          | ✅               | ✅             | ✅             |
-| Groq         | ✅          | ❌               | ✅             | ❌             |
-| Mistral      | ✅          | ✅               | ✅             | ✅             |
-| DeepSeek     | ✅          | ❌               | ❌             | ❌             |
-| xAI          | ✅          | ❌               | ❌             | ✅             |
-| OpenRouter   | ✅          | ✅               | ✅             | ✅             |
-| DashScope (Qwen) | ✅          | ❌               | ❌             | ❌             |
-| MiniMax      | ✅          | ❌               | ❌             | ✅             |
-| Novita       | ✅          | ❌               | ❌             | ❌             |
-| SiliconFlow  | ✅          | ❌               | ❌             | ❌             |
-| Z.ai         | ✅          | ❌               | ❌             | ❌             |
-| PayPerQ (PPQ) | ✅          | ✅               | ✅             | ✅             |
-| Cohere       | ✅          | ✅               | ❌             | ❌             |
-| Voyage       | ❌          | ✅               | ❌             | ❌             |
-| ElevenLabs   | ❌          | ❌               | ✅             | ✅             |
-| Deepgram     | ❌          | ❌               | ✅             | ✅             |
-| Ollama       | ✅          | ✅               | ❌             | ❌             |
-| oMLX         | ✅          | ✅               | ❌             | ❌             |
-| Azure OpenAI | ✅          | ✅               | ✅             | ✅             |
-| Vertex AI    | ✅          | ✅               | ❌             | ✅             |
-| OpenAI Compatible* | ✅          | ✅               | ✅             | ✅             |
-| Anthropic Compatible | ✅          | ❌               | ❌             | ❌             |
+## Development and verification
 
-*Supports LM Studio and any OpenAI-compatible endpoint. Prefer the native **oMLX** provider for [oMLX](https://omlx.ai/) (Apple Silicon); see [docs/5-CONFIGURATION/omlx.md](docs/5-CONFIGURATION/omlx.md).
+Install Python dependencies with `uv`, including the DataBridge extra:
 
-## ✨ Key Features
+```bash
+uv sync --extra databridge
+```
 
-### Core Capabilities
-- **🔒 Privacy-First**: Self-hosted; with local models nothing leaves your machine
-- **🎯 Multi-Notebook Organization**: Manage multiple research projects seamlessly
-- **📚 Universal Content Support**: PDFs, videos, audio, web pages, Office docs, and more
-- **🤖 Multi-Model AI Support**: 20+ providers including OpenAI, Anthropic, Ollama, Google, LM Studio, and more
-- **🎙️ Professional Podcast Generation**: Advanced multi-speaker podcasts with Episode Profiles
-- **🔍 Intelligent Search**: Full-text and vector search across all your content
-- **💬 Context-Aware Chat**: AI conversations powered by your research materials
-- **📝 AI-Assisted Notes**: Generate insights or write notes manually
+Follow the [development setup](docs/7-DEVELOPMENT/development-setup.md) for native services and environment configuration. Startup order is SurrealDB, API, background worker, then frontend. `make start-all` starts the base development services; gateway/MCP services and DataBridge flags still need their documented configuration.
 
-### Advanced Features
-- **⚡ Reasoning Model Support**: Full support for thinking models like DeepSeek-R1 and Qwen3
-- **🔧 Content Transformations**: Powerful customizable actions to summarize and extract insights
-- **🌐 Comprehensive REST API**: Full programmatic access for custom integrations [![API Docs](https://img.shields.io/badge/API-Documentation-blue?style=flat-square)](http://localhost:5055/docs)
-- **🔐 Optional Password Protection**: Secure public deployments with authentication
-- **📊 Fine-Grained Context Control**: Choose exactly what to share with AI models
-- **📎 Citations**: Get answers with proper source citations
+Backend checks from the repository root:
 
+```bash
+uv run pytest tests/
+uv run ruff check .
+uv run ruff format --check .
+uv run python -m mypy .
+```
 
-## Podcast Feature
+Frontend checks from `frontend/`:
 
-[![Check out our podcast sample](https://img.youtube.com/vi/D-760MlGwaI/0.jpg)](https://www.youtube.com/watch?v=D-760MlGwaI)
+```bash
+npm ci
+npm run lint
+npm run test:coverage
+npm run build
+```
 
-## 📚 Documentation
+Offline suites use mocks and isolated fixtures where appropriate. Live verification separately exercises actual catalog/publisher downloads, browser imports, the application MCP path, live model planning, and independent calculations. Never run real catalog credentials through the synthetic publisher overlay.
 
-### Getting Started
-- **[📖 Introduction](docs/0-START-HERE/index.md)** - Learn what Open Notebook offers
-- **[⚡ Quick Start with a Cloud Provider](docs/0-START-HERE/quick-start-cloud.md)** - OpenAI, Anthropic, Google and more in 5 minutes
-- **[🔧 Installation](docs/1-INSTALLATION/index.md)** - Comprehensive setup guide
-- **[🎯 Run It Fully Local](docs/0-START-HERE/quick-start-local.md)** - Ollama/LM Studio, completely private
+The [live report](docs/databridge/THREE_SOURCE_LIVE_DEMO.md#tests-and-limits) records test outcomes and the Windows native OpenSSL limitation. Reproducible verification scripts are in [`scripts/databridge_live/`](scripts/databridge_live/); the independent verifier checks matching source bytes rather than hardcoding changing upstream row counts.
 
-### User Guide
-- **[📱 Interface Overview](docs/3-USER-GUIDE/interface-overview.md)** - Understanding the layout
-- **[📚 Notebooks, Sources & Notes](docs/2-CORE-CONCEPTS/notebooks-sources-notes.md)** - Organizing your research
-- **[📄 Adding Sources](docs/3-USER-GUIDE/adding-sources.md)** - Managing content types
-- **[📝 Working with Notes](docs/3-USER-GUIDE/working-with-notes.md)** - Creating and managing notes
-- **[💬 Chatting Effectively](docs/3-USER-GUIDE/chat-effectively.md)** - AI conversations
-- **[🔍 Search](docs/3-USER-GUIDE/search.md)** - Finding information
+## Documentation and contributions
 
-### Advanced Topics
-- **[🎙️ Podcast Generation](docs/2-CORE-CONCEPTS/podcasts-explained.md)** - Create professional podcasts
-- **[🔧 Content Transformations](docs/3-USER-GUIDE/transformations.md)** - Customize content processing
-- **[🤖 AI Providers](docs/4-AI-PROVIDERS/index.md)** - Connect providers and set default models
-- **[🔌 MCP Integration](docs/5-CONFIGURATION/mcp-integration.md)** - Connect with Claude Desktop, VS Code and other MCP clients
-- **[🔧 REST API Reference](docs/7-DEVELOPMENT/api-reference.md)** - Complete API documentation
-- **[🔐 Security](docs/5-CONFIGURATION/security.md)** - Password protection and privacy
-- **[🚀 Deployment](docs/1-INSTALLATION/index.md)** - Complete deployment guides for all scenarios
-- **[🧭 Vision & Principles](VISION.md)** - What Open Notebook is, and where it's going
-- **[🛠️ Developer Docs](docs/7-DEVELOPMENT/index.md)** - Architecture, setup, contributing, decision records
+| Topic | Reference |
+| --- | --- |
+| Live three-source demo, exact sources and evidence | [Demo report](docs/databridge/THREE_SOURCE_LIVE_DEMO.md) |
+| Live environment and encrypted OpenRouter credential setup | [Launcher guide](scripts/databridge_live/README.md) |
+| Gateway, MCP, ingestion and research deployment | [Deployment entry point](deployment/databridge/README.md) |
+| Application architecture and development | [Developer documentation](docs/7-DEVELOPMENT/index.md) |
+| Notebook, source and provider features inherited from upstream | [Documentation index](docs/index.md) |
+| Implementation decisions | [Decision records](docs/7-DEVELOPMENT/decisions/) |
+| Recent changes | [Changelog](CHANGELOG.md) |
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+Use this fork's [issue tracker](https://github.com/BFODonnell/open-notebook/issues) for DataBridge-specific defects. Include reproduction steps and distinguish fixture results from live observations. Follow [AGENTS.md](AGENTS.md) and the [contribution guide](docs/7-DEVELOPMENT/contributing.md) when making changes.
 
-## 🗺️ Where We're Going
+## Upstream credit and license
 
-Right now the focus is on making the core experience (sources, chat, search, notes, podcasts) solid across every provider and deployment, before adding new product surfaces. The bigger directions under consideration, such as multi-user support, new output formats and agents operating Open Notebook through MCP, are described in the **Horizon** section of [VISION.md](VISION.md#horizon). They are directions, not dated promises.
+Open Notebook DataBridge builds on **Open Notebook**, created by **Luis Novo** and its contributors. The original research notebook, provider integrations, and core application architecture come from [lfnovo/open-notebook](https://github.com/lfnovo/open-notebook).
 
-Explore [GitHub Discussions](https://github.com/lfnovo/open-notebook/discussions/categories/ideas) for proposed features and product ideas, and [open Issues](https://github.com/lfnovo/open-notebook/issues) for known bugs and approved work. Recent changes are in the [CHANGELOG](CHANGELOG.md).
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-## 📖 Need Help?
-- **🤖 AI Installation Assistant**: We have a [CustomGPT built to help you install Open Notebook](https://chatgpt.com/g/g-68776e2765b48191bd1bae3f30212631-open-notebook-installation-assistant) - it will guide you through each step!
-- **New to Open Notebook?** Start with our [Getting Started Guide](docs/0-START-HERE/index.md)
-- **Need installation help?** Check our [Installation Guide](docs/1-INSTALLATION/index.md)
-- **Want to see it in action?** Try our [Quick Start Tutorial](docs/0-START-HERE/index.md)
-
-## 🤝 Community & Contributing
-
-### Join the Community
-- 💬 **[Discord Server](https://discord.gg/37XJPXfz2w)** - Get help, share ideas, and connect with other users
-- 𝕏 **[Follow @lfnovo on X](https://x.com/lfnovo)** - Project updates and news from the maintainer
-- 💡 **[GitHub Discussions](https://github.com/lfnovo/open-notebook/discussions)** - Ask questions and shape features, product direction, design, and architecture
-- 🐛 **[GitHub Issues](https://github.com/lfnovo/open-notebook/issues)** - Report reproducible bugs and find approved work
-- ⭐ **Star this repo** - Show your support and help others discover Open Notebook
-
-### Contributing
-We welcome contributions! We're especially looking for help with:
-- **Frontend Development**: Help improve our modern Next.js/React UI
-- **Testing & Bug Fixes**: Make Open Notebook more robust
-- **Feature Development**: Build the coolest research tool together
-- **Documentation**: Improve guides and tutorials
-
-**Current Tech Stack**: Python, FastAPI, Next.js, React, SurrealDB
-
-See our [Contributing Guide](CONTRIBUTING.md) for detailed information on how to get started, including our guidelines for [AI-assisted contributions](docs/7-DEVELOPMENT/contributing.md#ai-assisted-and-agent-generated-prs). To understand what we're building (and what we'll say no to), read [VISION.md](VISION.md).
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-## 📄 License
-
-Open Notebook is MIT licensed. See the [LICENSE](LICENSE) file for details.
-
-
-**Community Support**:
-- 💬 [Discord Server](https://discord.gg/37XJPXfz2w) - Get help, share ideas, and connect with users
-- 𝕏 [Follow @lfnovo on X](https://x.com/lfnovo) - Project updates and news from the maintainer
-- 💡 [GitHub Discussions](https://github.com/lfnovo/open-notebook/discussions) - Ask questions and shape ideas
-- 🐛 [GitHub Issues](https://github.com/lfnovo/open-notebook/issues) - Report reproducible bugs and find approved work
-- 🌐 [Website](https://www.open-notebook.ai) - Learn more about the project
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-<!-- MARKDOWN LINKS & IMAGES -->
-<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/lfnovo/open-notebook.svg?style=for-the-badge
-[contributors-url]: https://github.com/lfnovo/open-notebook/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/lfnovo/open-notebook.svg?style=for-the-badge
-[forks-url]: https://github.com/lfnovo/open-notebook/network/members
-[stars-shield]: https://img.shields.io/github/stars/lfnovo/open-notebook.svg?style=for-the-badge
-[stars-url]: https://github.com/lfnovo/open-notebook/stargazers
-[issues-shield]: https://img.shields.io/github/issues/lfnovo/open-notebook.svg?style=for-the-badge
-[issues-url]: https://github.com/lfnovo/open-notebook/issues
-[license-shield]: https://img.shields.io/github/license/lfnovo/open-notebook.svg?style=for-the-badge
-[license-url]: https://github.com/lfnovo/open-notebook/blob/main/LICENSE
-[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
-[linkedin-url]: https://linkedin.com/in/lfnovo
-[Next.js]: https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white
-[Next-url]: https://nextjs.org/
-[React]: https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black
-[React-url]: https://reactjs.org/
-[Python]: https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white
-[Python-url]: https://www.python.org/
-[LangChain]: https://img.shields.io/badge/LangChain-3A3A3A?style=for-the-badge&logo=chainlink&logoColor=white
-[LangChain-url]: https://www.langchain.com/
-[SurrealDB]: https://img.shields.io/badge/SurrealDB-FF5E00?style=for-the-badge&logo=databricks&logoColor=white
-[SurrealDB-url]: https://surrealdb.com/
+This fork retains the [MIT license](LICENSE) and the original copyright notice. DataBridge adds the catalog-to-notebook import, agentic research with approved MCP execution, model gateway, and analytical comparison workflows described above.

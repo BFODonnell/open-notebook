@@ -70,4 +70,19 @@ describe('Conversational database approval', () => {
     expect(screen.queryByText('private diagnostic')).not.toBeInTheDocument()
     await waitFor(() => expect(mocks.get).toHaveBeenCalledTimes(1))
   })
+
+  it('shows an escaped comparison table from executed evidence, retaining missing values', async () => {
+    mocks.get.mockResolvedValue({ ...proposed, state: 'completed', evidence: { rows: [
+      { reported_trips: 1234, report_year: 2022, precipitation: null },
+      { reported_trips: 2345, report_year: 2023, precipitation: '<img src=x>' },
+    ] } })
+    const { container } = setup()
+    const table = await screen.findByRole('table', { name: 'research.resultTable' })
+    expect(table.querySelector('th')?.textContent).toBe('report year')
+    expect(table).toHaveTextContent('1234')
+    expect(table).toHaveTextContent('2345')
+    expect(table).toHaveTextContent('research.nullValue')
+    expect(container.querySelector('img')).toBeNull()
+    expect(mocks.action).not.toHaveBeenCalled()
+  })
 })

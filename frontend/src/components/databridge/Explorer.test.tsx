@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { Explorer } from './Explorer'
+import { Explorer, publisherName } from './Explorer'
 
 const mocks = vi.hoisted(() => ({ search: vi.fn(), detail: vi.fn(), imports: vi.fn(), action: vi.fn(), preflight: vi.fn(), import: vi.fn(), control: vi.fn() }))
 vi.mock('@/lib/hooks/use-notebooks', () => ({ useNotebooks: () => ({ data: [{ id: 'notebook:1', name: 'Research' }] }) }))
@@ -21,7 +21,7 @@ describe('Open Data Explorer', () => {
     mocks.imports.mockReturnValue({ data: [] })
     mocks.action.mockReturnValue({ mutate: (fn: () => Promise<unknown>) => { void fn() }, isPending: false })
     mocks.preflight.mockResolvedValue(ready)
-    mocks.import.mockResolvedValue({})
+    mocks.import.mockResolvedValue({ id: 'db_import:1' })
   })
 
   it('passes search filters and inspects a selected catalog record', async () => {
@@ -45,8 +45,10 @@ describe('Open Data Explorer', () => {
     fireEvent.change(screen.getByLabelText('explorer.notebook'), { target: { value: 'notebook:1' } })
     fireEvent.click(screen.getByText('explorer.import'))
     expect(mocks.import).not.toHaveBeenCalled()
-    fireEvent.click(screen.getByText('explorer.confirmImport'))
+    expect(screen.getByRole('alertdialog')).toHaveTextContent('Research')
+    fireEvent.click(screen.getByRole('button', { name: 'explorer.confirmImport' }))
     await waitFor(() => expect(mocks.import).toHaveBeenCalledWith(resource.id, 'notebook:1', expect.any(String)))
+    await screen.findByText(/explorer.importSubmitted/)
   })
 
   it('blocks expired and adapter-required resources', () => {
@@ -68,11 +70,65 @@ describe('Open Data Explorer', () => {
   it('shows processing, cancellation and recoverable jobs', () => {
     mocks.imports.mockReturnValue({ data: [{ id: 'db_import:1', status: 'running', stage: 'downloading', recoverable: true }] })
     render(<Explorer />)
+    fireEvent.change(screen.getByLabelText('explorer.notebook'), { target: { value: 'notebook:1' } })
     expect(screen.getByRole('status')).toHaveTextContent('explorer.downloading')
     fireEvent.click(screen.getByText('explorer.cancel'))
-    expect(mocks.control).toHaveBeenCalledWith('db_import:1', 'cancel', '')
+    expect(mocks.control).toHaveBeenCalledWith('db_import:1', 'cancel', 'notebook:1')
     fireEvent.click(screen.getByText('explorer.retry'))
-    expect(mocks.control).toHaveBeenCalledWith('db_import:1', 'retry', '')
+    expect(mocks.control).toHaveBeenCalledWith('db_import:1', 'retry', 'notebook:1')
+  })
+
+  it('distinguishes no notebook, loading, empty and failed notebook queries', () => {
+    const { rerender } = render(<Explorer />)
+    expect(screen.getByText('explorer.noImports')).toBeInTheDocument()
+    fireEvent.change(screen.getByLabelText('explorer.notebook'), { target: { value: 'notebook:1' } })
+    expect(mocks.imports).toHaveBeenLastCalledWith('notebook:1')
+    expect(screen.queryByText('explorer.noImports')).toBeNull()
+    expect(screen.getByText('explorer.emptyNotebook')).toBeInTheDocument()
+    mocks.imports.mockReturnValue({ isPending: true })
+    rerender(<Explorer />)
+    expect(screen.getByText('explorer.loadingImports')).toBeInTheDocument()
+    mocks.imports.mockReturnValue({ isError: true })
+    rerender(<Explorer />)
+    expect(screen.queryByText('explorer.emptyNotebook')).toBeNull()
+    expect(screen.getByRole('alert')).toBeInTheDocument()
+  })
+
+  it('requires selection among discovered downloads before preview and import', async () => {
+    const children = [1, 2].map(i => ({ ...resource, id: `child:${i}`, metadata: { title: `File ${i}` } }))
+    mocks.preflight.mockResolvedValue({ status: 'connector_required', reason: 'DOWNLOAD_SELECTION_REQUIRED', resources: children })
+    render(<Explorer />)
+    fireEvent.change(screen.getByLabelText('explorer.notebook'), { target: { value: 'notebook:1' } })
+    fireEvent.click(screen.getByText('explorer.preview'))
+    await screen.findByLabelText('explorer.selectResource')
+    expect(screen.getAllByText('explorer.preview')).toHaveLength(1)
+    fireEvent.change(screen.getByLabelText('explorer.selectResource'), { target: { value: 'child:2' } })
+    mocks.preflight.mockResolvedValue(ready)
+    fireEvent.click(screen.getAllByText('explorer.preview')[1])
+    await screen.findByText('00001')
+    expect(mocks.preflight).toHaveBeenLastCalledWith('child:2')
+    fireEvent.click(screen.getAllByText('explorer.import')[1])
+    fireEvent.click(screen.getByRole('button', { name: 'explorer.confirmImport' }))
+    await waitFor(() => expect(mocks.import).toHaveBeenCalledWith('child:2', 'notebook:1', expect.any(String)))
+  })
+
+  it('reuses the request key when confirmation is reopened for the same resource', async () => {
+    render(<Explorer />)
+    fireEvent.change(screen.getByLabelText('explorer.notebook'), { target: { value: 'notebook:1' } })
+    fireEvent.click(screen.getByText('explorer.preview'))
+    await screen.findByText('00001')
+    for (let i = 0; i < 2; i++) {
+      fireEvent.click(screen.getByText('explorer.import'))
+      fireEvent.click(screen.getByRole('button', { name: 'explorer.confirmImport' }))
+      await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull())
+    }
+    expect(mocks.import.mock.calls[0]).toEqual(mocks.import.mock.calls[1])
+  })
+
+  it('renders readable publishers without losing structured detail metadata', () => {
+    expect(publisherName({ name: 'Federal Transit Administration', '@type': 'Organization' })).toBe('Federal Transit Administration')
+    expect(publisherName('[{"name":"FTA"}]')).toBe('FTA')
+    expect(publisherName({ '@id': 'unknown' })).toBe('')
   })
 
   it('opens the scoped MCP query UI and preserves provenance and chat boundary', () => {

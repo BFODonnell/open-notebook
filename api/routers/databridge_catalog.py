@@ -3,7 +3,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel, ConfigDict
 
-from open_notebook.databridge.ingestion import catalog, service
+from open_notebook.databridge.ingestion import catalog, publishers, service
 from open_notebook.databridge.ingestion.download import AcquisitionError
 from open_notebook.exceptions import ExternalServiceError
 
@@ -33,6 +33,11 @@ async def dataset(dataset_ref: str):
     return await acquire(catalog.dataset(dataset_ref))
 
 
+@router.post("/catalog/publishers/select")
+async def publisher_selection(data: publishers.Selection):
+    return await acquire(publishers.select(data))
+
+
 @router.post("/catalog/resources/{resource_ref}/preflight")
 async def preflight(resource_ref: str):
     return await acquire(service.preflight(resource_ref))
@@ -48,6 +53,32 @@ class ImportRequest(BaseModel):
 class NotebookRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     notebook_id: str
+
+
+class ComparisonRequest(NotebookRequest):
+    model_config = ConfigDict(extra="forbid")
+    transit: str
+    population: str
+    weather: str
+
+
+class ComparisonApproval(NotebookRequest):
+    model_config = ConfigDict(extra="forbid")
+    approval_token: str
+
+
+@router.post("/comparisons/review")
+async def review_comparison(data: ComparisonRequest):
+    from open_notebook.databridge import comparison
+
+    return await comparison.prepare(**data.model_dump())
+
+
+@router.post("/comparisons/{job_id}/approve")
+async def approve_comparison(job_id: str, data: ComparisonApproval):
+    from open_notebook.databridge import comparison
+
+    return await comparison.approve(job_id, data.notebook_id, data.approval_token)
 
 
 @router.post("/imports")
